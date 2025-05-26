@@ -29,19 +29,19 @@ const About = () => {
     {
       name: "Fakii Mohammed",
       role: "CEO & Founder",
-      image: "/lovable-uploads/2a1e00da-ae0b-460a-b314-21b9d7588ff8.png",
+      image: "/assets/team/team-member-1.png",
       description: "Agricultural technology visionary with a passion for empowering farmers"
     },
     {
       name: "Muna Adan",
       role: "CTO",
-      image: "/lovable-uploads/d96ec09f-0407-44cb-85aa-7e28d60d5429.png",
+      image: "/assets/team/team-member-2.png",
       description: "Tech innovator specializing in AI and agricultural applications"
     },
     {
       name: "Charmaine Ramaphala",
       role: "Head of Operations",
-      image: "/lovable-uploads/eb38e06a-645c-4991-a02c-68da848449ff.png",
+      image: "/assets/team/team-member-3.png",
       description: "Operations expert ensuring seamless service delivery to farmers"
     }
   ];
