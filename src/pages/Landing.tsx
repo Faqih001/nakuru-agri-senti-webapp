@@ -478,12 +478,15 @@ const Landing = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
-                <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="bg-white text-green-600 hover:bg-green-100 hover:text-green-700 w-full sm:w-auto transition-colors"
+                >
                   Start Your Free Trial
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-2 border-white text-black hover:bg-white/20 w-full sm:w-auto">
                   Contact Sales
                 </Button>
               </Link>
