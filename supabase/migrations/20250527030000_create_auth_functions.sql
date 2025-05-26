@@ -11,13 +11,10 @@ BEGIN
         AND user_id = p_user_id
         AND used_at IS NULL;
 
-        -- Update user's email verification status
+        -- Update user's email verification status and set to active
         UPDATE users
         SET email_verified = true,
-            status = CASE 
-                WHEN phone_verified = true THEN 'active'::user_status 
-                ELSE status 
-            END
+            status = 'active'::user_status
         WHERE id = p_user_id;
 
         -- Commit transaction
