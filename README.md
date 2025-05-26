@@ -225,6 +225,35 @@ nakuru-agri-senti-webapp/
 └── package.json          # Project dependencies and scripts
 ```
 
+## Asset Management
+
+The project includes various assets organized by type:
+
+### Images
+
+Located in `public/assets/images/`:
+
+- **agri-banner.png** - Main banner for the AgriSenti application
+- **crop-assistant.png** - Illustration for the Crop Assistant feature
+- **disease-detection.png** - Illustration for the Disease Detection feature
+- **market-dashboard.png** - Illustration for the Market Dashboard feature
+- **weather-monitoring.png** - Illustration for the Weather Monitoring feature
+- **interactive-maps.png** - Illustration for the Interactive Maps feature
+
+### Team Member Images
+
+Located in `public/assets/team/`:
+
+- **team-member-1.png** - Photo of Fakii Mohammed (CEO & Founder)
+- **team-member-2.png** - Photo of Muna Adan (CTO)
+- **team-member-3.png** - Photo of Charmaine Ramaphala (Head of Operations)
+
+### Icons
+
+Located in `public/assets/icons/`:
+
+- **agri-logo.png** - Official AgriSenti logo
+
 ## Contributing
 
 We welcome contributions to the AgriSenti project! Here's how you can help:
