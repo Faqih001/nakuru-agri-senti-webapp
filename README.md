@@ -95,12 +95,12 @@ A geospatial information system that:
 
 ### Maps and Visualization
 
-- **Mapbox GL JS (3.12+)**: Interactive, customizable maps with WebGL acceleration for:
-  - High-performance vector maps rendering
-  - Custom map styles and data visualization
+- **Google Maps API**: Interactive, customizable maps with extensive features including:
+  - High-performance map rendering
+  - Custom styles and data visualization
   - Geocoding and geolocation services
-  - Interactive markers and popups
-  - 3D terrain visualization
+  - Interactive markers and info windows
+  - Street View integration
 
 ## System Architecture
 
@@ -128,7 +128,7 @@ AgriSenti follows a modern client-server architecture designed for scalability a
 - **Node.js**: v18.0.0 or later (v20+ recommended for best performance)
 - **Package Manager**: npm v9+ or Bun v1.0.2+
 - **Supabase Account**: Free tier sufficient for development
-- **Mapbox API Key**: Required for map functionality
+- **Google Maps API Key**: Required for map functionality
 
 ### Development Environment Setup
 
@@ -149,7 +149,7 @@ cp .env.example .env.local
 
 # Step 5: Fill in required environment variables in .env.local
 # - Add your Supabase URL and anon key
-# - Add your Mapbox access token
+# - Add your Google Maps API key
 # - Configure other optional services
 
 # Step 6: Start the development server
@@ -194,12 +194,12 @@ Create a `.env.local` file in the root directory with the following variables:
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Mapbox Configuration
-VITE_MAPBOX_ACCESS_TOKEN=your_mapbox_token
+# Maps Configuration
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
 # API Configuration
 VITE_API_BASE_URL=your_api_base_url
-VITE_WEATHER_API_KEY=your_weather_api_key (optional)
+VITE_WEATHER_API_KEY=b3526825bf6345ad829220441252605
 
 # Feature Flags
 VITE_ENABLE_OFFLINE_MODE=true
