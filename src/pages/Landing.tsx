@@ -421,8 +421,8 @@ const Landing = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <img 
-                src="https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=600&h=400&fit=crop" 
-                alt="Successful African farmer"
+                src="https://images.unsplash.com/photo-1621343268515-38a2d9661166?w=600&h=400&fit=crop" 
+                alt="Successful African farmers in Nakuru"
                 className="rounded-2xl shadow-lg"
               />
             </div>
