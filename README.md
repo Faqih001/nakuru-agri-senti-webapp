@@ -254,6 +254,13 @@ Located in `public/assets/icons/`:
 
 - **agri-logo.png** - Official AgriSenti logo
 
+### Root Assets
+
+Located in the `public/` directory:
+
+- **favicon.ico** - Website favicon based on the AgriSenti logo
+- **agri.png** - Main AgriSenti logo image used for social media sharing
+
 ## Contributing
 
 We welcome contributions to the AgriSenti project! Here's how you can help:
