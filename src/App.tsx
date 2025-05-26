@@ -23,7 +23,6 @@ import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
-import VerifyPhone from "./pages/VerifyPhone";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +44,6 @@ const App = () => (
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/verify-phone" element={<VerifyPhone />} />
               <Route path="/features" element={<Features />} />
               <Route path="/features/:featureId" element={<FeatureDetail />} />
               <Route path="/about" element={<About />} />
