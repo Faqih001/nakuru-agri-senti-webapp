@@ -53,7 +53,7 @@ const Landing = () => {
       role: "Maize & Bean Farmer",
       quote: "The market linkage feature connected me directly with buyers in Nairobi. I now get 25% better prices for my maize and beans.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1595041392543-2c8b550f87b3?w=100&h=100&fit=crop&crop=face"
+      image: "/assets/images/peter.avif"
     },
     {
       name: "Grace Muthoni",
@@ -61,7 +61,7 @@ const Landing = () => {
       role: "Greenhouse Farmer",
       quote: "The AI advisory system recommended the perfect planting schedule. My tomato harvest timing is now perfectly aligned with market demand.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1621112904887-419379ce6824?w=100&h=100&fit=crop&crop=face"
+      image: "/assets/images/grace.avif"
     }
   ];
 
@@ -421,7 +421,7 @@ const Landing = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <img
-                src="https://images.unsplash.com/photo-1595041392543-c1ec84f26c98?w=600&h=400&fit=crop"
+                src="/assets/images/African-farmer.avif"
                 alt="African farmer proudly holding fresh produce from his farm"
                 className="rounded-2xl shadow-lg"
               />
