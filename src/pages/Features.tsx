@@ -24,7 +24,7 @@ const Features = () => {
       icon: Sprout,
       title: "AI Crop Assistant",
       description: "Get personalized farming advice powered by advanced AI algorithms",
-      image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop",
+      image: "/assets/images/crop-assistant.png",
       benefits: ["Personalized recommendations", "Weather-based insights", "Crop optimization"],
       gradient: "from-green-500 to-emerald-600"
     },
@@ -33,7 +33,7 @@ const Features = () => {
       icon: Camera,
       title: "Disease Detection",
       description: "Instant plant disease diagnosis using computer vision technology",
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop",
+      image: "/assets/images/disease-detection.png",
       benefits: ["Real-time scanning", "99% accuracy", "Treatment suggestions"],
       gradient: "from-blue-500 to-cyan-600"
     },
@@ -42,7 +42,7 @@ const Features = () => {
       icon: TrendingUp,
       title: "Market Intelligence",
       description: "Access real-time market prices and connect with verified buyers",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
+      image: "/assets/images/market-dashboard.png",
       benefits: ["Live price updates", "Buyer connections", "Market trends"],
       gradient: "from-orange-500 to-red-600"
     },
@@ -51,7 +51,7 @@ const Features = () => {
       icon: Shield,
       title: "Risk Management",
       description: "Protect your investments with comprehensive risk assessment tools",
-      image: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=800&h=600&fit=crop",
+      image: "/assets/images/weather-monitoring.png",
       benefits: ["Weather alerts", "Insurance guidance", "Risk analytics"],
       gradient: "from-purple-500 to-pink-600"
     },
@@ -60,7 +60,7 @@ const Features = () => {
       icon: Smartphone,
       title: "Mobile First",
       description: "Complete farming solutions accessible from your smartphone",
-      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop",
+      image: "/assets/images/agri-banner.png",
       benefits: ["Offline capabilities", "GPS integration", "Easy interface"],
       gradient: "from-indigo-500 to-blue-600"
     },
@@ -69,7 +69,7 @@ const Features = () => {
       icon: Users,
       title: "Community Support",
       description: "Connect with fellow farmers and agricultural experts",
-      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop",
+      image: "/assets/images/interactive-maps.png",
       benefits: ["Expert advice", "Farmer networks", "Knowledge sharing"],
       gradient: "from-teal-500 to-green-600"
     }
