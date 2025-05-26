@@ -449,12 +449,14 @@ const Landing = () => {
                 ))}
               </div>
 
-              <Link to="/auth">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 group">
-                  Get Started Today
-                  <Zap className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
-                </Button>
-              </Link>
+              <div className="pt-6">
+                <Link to="/auth">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 group">
+                    Get Started Today
+                    <Zap className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -481,7 +483,7 @@ const Landing = () => {
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600 w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 w-full sm:w-auto">
                   Contact Sales
                 </Button>
               </Link>
