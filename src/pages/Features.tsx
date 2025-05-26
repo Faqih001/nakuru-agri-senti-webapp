@@ -24,7 +24,7 @@ const Features = () => {
       icon: Sprout,
       title: "AI Crop Assistant",
       description: "Get personalized farming advice powered by advanced AI algorithms",
-      image: "/assets/images/crop-assistant.png",
+      image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop",
       benefits: ["Personalized recommendations", "Weather-based insights", "Crop optimization"],
       gradient: "from-green-500 to-emerald-600"
     },
@@ -33,7 +33,7 @@ const Features = () => {
       icon: Camera,
       title: "Disease Detection",
       description: "Instant plant disease diagnosis using computer vision technology",
-      image: "/assets/images/disease-detection.png",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop",
       benefits: ["Real-time scanning", "99% accuracy", "Treatment suggestions"],
       gradient: "from-blue-500 to-cyan-600"
     },
@@ -42,7 +42,7 @@ const Features = () => {
       icon: TrendingUp,
       title: "Market Intelligence",
       description: "Access real-time market prices and connect with verified buyers",
-      image: "/assets/images/market-dashboard.png",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
       benefits: ["Live price updates", "Buyer connections", "Market trends"],
       gradient: "from-orange-500 to-red-600"
     },
@@ -51,7 +51,7 @@ const Features = () => {
       icon: Shield,
       title: "Risk Management",
       description: "Protect your investments with comprehensive risk assessment tools",
-      image: "/assets/images/weather-monitoring.png",
+      image: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=800&h=600&fit=crop",
       benefits: ["Weather alerts", "Insurance guidance", "Risk analytics"],
       gradient: "from-purple-500 to-pink-600"
     },
@@ -60,7 +60,7 @@ const Features = () => {
       icon: Smartphone,
       title: "Mobile First",
       description: "Complete farming solutions accessible from your smartphone",
-      image: "/assets/images/agri-banner.png",
+      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop",
       benefits: ["Offline capabilities", "GPS integration", "Easy interface"],
       gradient: "from-indigo-500 to-blue-600"
     },
@@ -69,7 +69,7 @@ const Features = () => {
       icon: Users,
       title: "Community Support",
       description: "Connect with fellow farmers and agricultural experts",
-      image: "/assets/images/interactive-maps.png",
+      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop",
       benefits: ["Expert advice", "Farmer networks", "Knowledge sharing"],
       gradient: "from-teal-500 to-green-600"
     }
@@ -228,13 +228,16 @@ const Features = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
-                <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 px-8">
+                <Button
+                  size="lg"
+                  className="bg-white text-green-600 hover:bg-green-100 px-8 transition-colors"
+                >
                   Get Started Free
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
+                <Button size="lg" variant="outline" className="border-white text-green-600 hover:bg-white/10 px-8">
                   Contact Sales
                 </Button>
               </Link>
