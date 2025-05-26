@@ -99,3 +99,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .animate-delay-100 {
+    animation-delay: 0.1s;
+  }
+  
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+}

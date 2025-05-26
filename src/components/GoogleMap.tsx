@@ -11,7 +11,6 @@ const GoogleMap = () => {
         src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=Nakuru,Kenya&zoom=12`}
         title="AgriSenti Office Location in Nakuru, Kenya"
         allowFullScreen
-        loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
         className="rounded-lg w-full h-full border-0"
       />
