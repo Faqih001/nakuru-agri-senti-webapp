@@ -5,10 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, Upload, AlertTriangle, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+interface AnalysisResult {
+  disease: string;
+  confidence: number;
+  severity: string;
+  description: string;
+  treatment: string;
+  prevention: string;
+}
+
 export const DiseaseDetection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -120,12 +129,17 @@ export const DiseaseDetection = () => {
               )}
             </div>
             
+            <label htmlFor="disease-image-upload" className="sr-only">
+              Upload an image for disease detection
+            </label>
             <input
+              id="disease-image-upload"
               type="file"
               ref={fileInputRef}
               onChange={handleImageUpload}
               accept="image/*"
               className="hidden"
+              aria-label="Upload an image for disease detection"
             />
             
             <Button 
