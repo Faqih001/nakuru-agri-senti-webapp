@@ -250,3 +250,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Local Farmer Cooperatives** for user testing and feedback
 - **Kenya Meteorological Department** for weather data integration
 - **The Agriculture and Food Authority (AFA)** for market price data
+
+## Meet Our Team
+
+The AgriSenti project is developed and maintained by a dedicated team with expertise in agricultural technology and software development:
+
+- **Fakii Mohammed** - CEO & Founder  
+  Agricultural technology visionary with a passion for empowering farmers
+
+- **Muna Adan** - CTO  
+  Tech innovator specializing in AI and agricultural applications
+
+- **Charmaine Ramaphala** - Head of Operations  
+  Operations expert ensuring seamless service delivery to farmers
+
+Our diverse team brings together experience in agricultural science, software development, UI/UX design, and community engagement to create a solution that truly meets the needs of Nakuru's farming community.
