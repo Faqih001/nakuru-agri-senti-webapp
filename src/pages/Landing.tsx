@@ -420,9 +420,9 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <img 
-                src="https://images.unsplash.com/photo-1621343268515-38a2d9661166?w=600&h=400&fit=crop" 
-                alt="Successful African farmers in Nakuru"
+              <img
+                src="https://images.unsplash.com/photo-1595041392543-c1ec84f26c98?w=600&h=400&fit=crop"
+                alt="African farmer proudly holding fresh produce from his farm"
                 className="rounded-2xl shadow-lg"
               />
             </div>
