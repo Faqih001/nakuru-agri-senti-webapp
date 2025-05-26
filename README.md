@@ -1,6 +1,6 @@
 # Nakuru AgriSenti WebApp
 
-![AgriSenti Banner](public/lovable-uploads/eb38e06a-645c-4991-a02c-68da848449ff.png)
+
 
 ## Project Overview
 
