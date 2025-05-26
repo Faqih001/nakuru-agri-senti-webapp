@@ -99,8 +99,42 @@ A geospatial information system that:
   - High-performance map rendering
   - Custom styles and data visualization
   - Geocoding and geolocation services
-  - Interactive markers and info windows
-  - Street View integration
+
+## Feature Images
+
+All feature images are sourced from Unsplash, optimized for performance and consistency:
+
+### AI Crop Assistant Feature
+
+- **Source**: [Unsplash Photo by Gabriel Jimenez](https://images.unsplash.com/photo-1574943320219-553eb213f72d)
+- **Dimensions**: 800x600px (cropped)
+
+### Disease Detection Feature
+
+- **Source**: [Unsplash Photo by Ales Krivec](https://images.unsplash.com/photo-1416879595882-3373a0480b5b)
+- **Dimensions**: 800x600px (cropped)
+
+### Market Intelligence Feature
+
+- **Source**: [Unsplash Photo by Carlos Muza](https://images.unsplash.com/photo-1460925895917-afdab827c52f)
+- **Dimensions**: 800x600px (cropped)
+
+### Risk Management Feature
+
+- **Source**: [Unsplash Photo by NOAA](https://images.unsplash.com/photo-1586771107445-d3ca888129ff)
+- **Dimensions**: 800x600px (cropped)
+
+### Mobile First Feature
+
+- **Source**: [Unsplash Photo by Rahul Chakraborty](https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c)
+- **Dimensions**: 800x600px (cropped)
+
+### Community Support Feature
+
+- **Source**: [Unsplash Photo by Annie Spratt](https://images.unsplash.com/photo-1542601906990-b4d3fb778b09)
+- **Dimensions**: 800x600px (cropped)
+
+All images are licensed under the Unsplash License and are free to use for both personal and commercial purposes.
 
 ## System Architecture
 
