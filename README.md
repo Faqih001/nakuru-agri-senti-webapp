@@ -1,5 +1,8 @@
 # Nakuru AgriSenti WebApp
 
+<p align="center">
+  <img src="public/agri.png" alt="AgriSenti Logo" width="200" />
+</p>
 
 
 ## Project Overview
