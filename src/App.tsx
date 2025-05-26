@@ -4,21 +4,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/components/Layout";
+import { DashboardLayout } from "@/components/DashboardLayout";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Features from "./pages/Features";
+import { CropAssistant } from "@/components/CropAssistant";
+import { DiseaseDetection } from "@/components/DiseaseDetection";
+import { MarketDashboard } from "@/components/MarketDashboard";
+import { WeatherDashboard } from "@/pages/WeatherDashboard";
+import { Settings } from "@/pages/Settings";
 import FeatureDetail from "./pages/FeatureDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import VerifyEmail from "./pages/VerifyEmail";
-import VerifyPhone from "./pages/VerifyPhone";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -33,30 +34,37 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/landing" element={<Landing />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/login" element={<Auth />} />
-                <Route path="/signup" element={<Auth />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/verify-email" element={<VerifyEmail />} />
-                <Route path="/verify-phone" element={<VerifyPhone />} />
-                <Route path="/features" element={<Features />} />
-                <Route path="/features/:featureId" element={<FeatureDetail />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <Routes>
+            {/* Public routes with main layout */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/verify-phone" element={<VerifyPhone />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/features/:featureId" element={<FeatureDetail />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+            </Route>
+
+            {/* Dashboard routes */}
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="crop-assistant" element={<CropAssistant />} />
+              <Route path="disease-detection" element={<DiseaseDetection />} />
+              <Route path="weather" element={<WeatherDashboard />} />
+              <Route path="market" element={<MarketDashboard />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
