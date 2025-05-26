@@ -1,9 +1,6 @@
 # Nakuru AgriSenti WebApp
 
-<p align="center">
-  <img src="public/agri.png" alt="AgriSenti Logo" width="500" />
-</p>
-
+![AgriSenti Logo](public/agri.png)
 
 ## Project Overview
 
@@ -16,6 +13,7 @@ Developed to bridge the information gap in Nakuru's agricultural sector, AgriSen
 ### Crop Assistant
 
 An AI-powered virtual agricultural expert that provides:
+
 - **Personalized Farming Advice**: Tailored recommendations based on Nakuru's unique soil conditions, climate patterns, and local agricultural practices
 - **Crop Management Guidance**: Step-by-step instructions for optimal crop care throughout the growing season
 - **Planting Schedules**: Customized planting calendars accounting for Nakuru's bimodal rainfall patterns
@@ -26,6 +24,7 @@ An AI-powered virtual agricultural expert that provides:
 ### Disease Detection
 
 A sophisticated plant health monitoring system that:
+
 - **Analyzes Crop Images**: Uses computer vision algorithms to process uploaded photos of plant leaves, stems, and fruits
 - **Identifies 20+ Common Diseases**: Accurately detects prevalent diseases affecting maize, beans, potatoes, and other Nakuru staple crops
 - **Diagnoses Nutrient Deficiencies**: Recognizes visual symptoms of specific mineral deficiencies in plants
@@ -36,6 +35,7 @@ A sophisticated plant health monitoring system that:
 ### Market Dashboard
 
 A comprehensive market intelligence platform that:
+
 - **Tracks Real-Time Crop Prices**: Monitors current selling prices across Nakuru's major agricultural markets
 - **Analyzes Price Trends**: Visualizes historical price data with interactive charts to identify optimal selling periods
 - **Connects to Verified Buyers**: Provides direct links to pre-vetted agricultural buyers and processing companies
@@ -46,6 +46,7 @@ A comprehensive market intelligence platform that:
 ### Weather Monitoring
 
 A specialized agricultural weather system that:
+
 - **Provides Hyperlocal Forecasts**: Offers micro-climate predictions specific to Nakuru's diverse topography
 - **Issues Early Weather Alerts**: Warns about incoming weather events that could impact farming operations
 - **Tracks Seasonal Patterns**: Analyzes rainfall distribution and temperature trends throughout the year
@@ -56,6 +57,7 @@ A specialized agricultural weather system that:
 ### Interactive Maps
 
 A geospatial information system that:
+
 - **Visualizes Agricultural Data**: Maps out crop distribution, yield potential, and land utilization across Nakuru County
 - **Locates Market Centers**: Shows the positions of trading centers with information on market days and specializations
 - **Identifies Extension Services**: Pinpoints locations of agricultural extension offices and input suppliers
@@ -154,6 +156,7 @@ cp .env.example .env.local
 npm run dev
 # or
 bun run dev
+```sh
 ```
 
 ### Building for Production
@@ -205,7 +208,7 @@ VITE_ENABLE_ANALYTICS=false
 
 ## Project Structure
 
-```
+```text
 nakuru-agri-senti-webapp/
 ├── public/               # Static assets
 ├── src/
