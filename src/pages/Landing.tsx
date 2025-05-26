@@ -45,7 +45,7 @@ const Landing = () => {
       role: "Potato Farmer",
       quote: "AgriSenti helped me increase my potato yield by 40% this season. The disease detection feature saved my entire crop from late blight.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1604975999044-188783d54fb3?w=100&h=100&fit=crop&crop=face"
+      image: "https://images.unsplash.com/photo-1597393922738-085ea04b5a07?w=100&h=100&fit=crop&crop=face"
     },
     {
       name: "Peter Kiprotich",
@@ -53,7 +53,7 @@ const Landing = () => {
       role: "Maize & Bean Farmer",
       quote: "The market linkage feature connected me directly with buyers in Nairobi. I now get 25% better prices for my maize and beans.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1597393922738-085ea04b5a07?w=100&h=100&fit=crop&crop=face"
+      image: "https://images.unsplash.com/photo-1595041392543-2c8b550f87b3?w=100&h=100&fit=crop&crop=face"
     },
     {
       name: "Grace Muthoni",
