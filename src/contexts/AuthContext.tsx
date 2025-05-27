@@ -780,7 +780,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           toast({
             title: "Account created",
-            description: "Please check your email to verify your account. A verification link has been sent to your inbox.",
+            description: "Please check your email to verify your account. A verification link has been sent to your inbox. Check your spam folder if you don't see it.",
+            duration: 6000
           });
         }
       }

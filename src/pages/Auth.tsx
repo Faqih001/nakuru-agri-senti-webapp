@@ -272,6 +272,15 @@ const Auth = () => {
                       "Sign In to Dashboard"
                     )}
                   </Button>
+
+                  <div className="flex justify-between mt-2 text-sm">
+                    <Link to="/forgot-password" className="text-green-600 hover:text-green-700">
+                      Forgot password?
+                    </Link>
+                    <Link to="/resend-verification" className="text-green-600 hover:text-green-700">
+                      Resend verification email
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
 
@@ -413,6 +422,10 @@ const Auth = () => {
                       "Create Account & Access Dashboard"
                     )}
                   </Button>
+                  
+                  <div className="mt-4 text-sm text-gray-600 bg-green-50 p-3 rounded-md border border-green-200">
+                    <p>After signing up, you'll need to verify your email address. Please check your inbox (and spam folder) for a verification link.</p>
+                  </div>
                 </form>
               </TabsContent>
             </Tabs>
