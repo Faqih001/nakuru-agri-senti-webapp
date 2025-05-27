@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase, SupabaseError } from '@/integrations/supabase/client';
+import { supabase, SupabaseError } from '@/integrations/supabase      console.log('Creating user profile with data:', profileData);
+      
+      // Use service role client to bypass RLS policies if available,
+      // otherwise fall back to regular client
+      const client = serviceRoleClient || supabase;
+      const { error: profileError } = await client
+        .from('user_profiles')
+        .insert(profileData);
+
+      if (profileError) {t';
 // Import the serviceRoleClient for bypassing RLS policies
 import { serviceRoleClient } from '@/integrations/supabase/admin';
 import { useToast } from '@/hooks/use-toast';
@@ -193,18 +202,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       console.log('Creating user profile with data:', profileData);
-      
-      // Check if service role client is available
-      if (!serviceRoleClient) {
-        console.error('Service role client is not available. Check if VITE_SUPABASE_SERVICE_ROLE_KEY is set in your environment variables.');
-        throw new Error('Service role client is not available for profile creation');
-      }
-      
-      // Use service role client to bypass RLS policies
-      // Spread the object into a new object to satisfy TypeScript's type requirements
       const { error: profileError } = await serviceRoleClient
         .from('user_profiles')
-        .insert({...profileData});
+        .insert(profileData);
 
       if (profileError) {
         console.error('Error creating user profile:', profileError);
