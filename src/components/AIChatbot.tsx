@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Constants
-const MODEL_NAME = 'gemini-pro';
+const MODEL_NAME = 'gemini-pro';  // This should be the correct model name
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
