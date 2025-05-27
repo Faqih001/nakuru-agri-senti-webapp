@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Outlet } from "react-router-dom";
+import ConfigurationAlert from "@/components/ConfigurationAlert";
 
 export const Layout = () => {
   return (
@@ -10,6 +11,8 @@ export const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      {/* Only show the configuration alert in development mode */}
+      {import.meta.env.DEV && <ConfigurationAlert />}
     </div>
   );
 };
