@@ -208,6 +208,60 @@ export const AIChatbot: React.FC = () => {
     }
   }, [messages, isOpen]);
 
+  // Function for screen reader announcements
+  const announceForScreenReader = (message: string) => {
+    // Create or get the announcement element
+    let announcer = document.getElementById('sr-announcer');
+    if (!announcer) {
+      announcer = document.createElement('div');
+      announcer.id = 'sr-announcer';
+      announcer.setAttribute('aria-live', 'polite');
+      announcer.setAttribute('aria-atomic', 'true');
+      announcer.style.position = 'absolute';
+      announcer.style.width = '1px';
+      announcer.style.height = '1px';
+      announcer.style.padding = '0';
+      announcer.style.overflow = 'hidden';
+      announcer.style.clip = 'rect(0, 0, 0, 0)';
+      announcer.style.whiteSpace = 'nowrap';
+      announcer.style.border = '0';
+      document.body.appendChild(announcer);
+    }
+    
+    // Set the message to be announced
+    announcer.textContent = message;
+    
+    // Clear after a delay to prevent multiple announcements of the same message
+    setTimeout(() => {
+      announcer.textContent = '';
+    }, 1000);
+  };
+
+  // Helper function to optimize prompt based on device size
+  const getOptimizedPrompt = (input: string): string => {
+    // For mobile devices, ask for more concise responses
+    const basePrompt = `You are AgriSentiBot, an AI assistant for AgriSenti, an agriculture platform focused on helping farmers in Kenya, especially around Nakuru.
+    You provide information about:
+    1. Farming practices suitable for the Nakuru region
+    2. Weather forecasts and climate-smart farming
+    3. Crop diseases identification and prevention
+    4. Market prices and agricultural economics
+    5. Sustainable agriculture techniques
+    
+    Be friendly, helpful, and provide practical advice that farmers in Kenya can implement.
+    Current date: ${new Date().toLocaleDateString()}`;
+    
+    // For smaller screens, request more concise responses
+    if (isMobileView) {
+      return `${basePrompt} 
+      IMPORTANT: The user is on a mobile device with limited screen space. 
+      Keep your responses concise and to the point. Use bullet points where appropriate.
+      Limit response to 150-200 words maximum. User query: ${input}`;
+    }
+    
+    return `${basePrompt} User query: ${input}`;
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
@@ -237,19 +291,10 @@ export const AIChatbot: React.FC = () => {
       // Get the generative model
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
       
-      // Create system prompt for context
+      // Create optimized system prompt based on device size
       const systemPrompt = {
         role: 'system',
-        content: `You are AgriSentiBot, an AI assistant for AgriSenti, an agriculture platform focused on helping farmers in Kenya, especially around Nakuru.
-        You provide information about:
-        1. Farming practices suitable for the Nakuru region
-        2. Weather forecasts and climate-smart farming
-        3. Crop diseases identification and prevention
-        4. Market prices and agricultural economics
-        5. Sustainable agriculture techniques
-        
-        Be friendly, helpful, and provide practical advice that farmers in Kenya can implement.
-        Current date: ${new Date().toLocaleDateString()}`
+        content: getOptimizedPrompt(currentInput)
       };
       
       // Gather conversation history, limited to last 10 messages to avoid token limits
@@ -270,6 +315,9 @@ export const AIChatbot: React.FC = () => {
       // Add model response
       const assistantMessage = { role: 'model' as const, content: text };
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Announce the new message for screen readers
+      announceForScreenReader(text);
     } catch (error) {
       console.error('Error communicating with Gemini API:', error);
       const errorMessage = { 
