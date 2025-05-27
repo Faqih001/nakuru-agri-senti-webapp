@@ -10,7 +10,7 @@ import { CropAssistant } from "@/components/CropAssistant";
 import { DiseaseDetection } from "@/components/DiseaseDetection";
 import { MarketDashboard } from "@/components/MarketDashboard";
 import { Sprout, Camera, TrendingUp, Settings, Bell, LogOut, User, BarChart, Calendar, Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
