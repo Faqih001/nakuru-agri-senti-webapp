@@ -16,20 +16,36 @@ const VerifyEmail = () => {
     const verifyEmail = async () => {
       if (!token) {
         setVerificationStatus('error');
+        toast({
+          title: "Verification failed",
+          description: "No verification token found",
+          variant: "destructive"
+        });
         return;
       }
 
       try {
-        // TODO: Implement email verification
-        const response = await fetch('/api/verify-email', {
+        // Extract the token from URL (it comes as #access_token=xxx&type=recovery)
+        const hashParams = new URLSearchParams(token.replace('#', ''));
+        const accessToken = hashParams.get('access_token');
+
+        if (!accessToken) {
+          throw new Error('Invalid verification link');
+        }
+
+        const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-email`;
+        const response = await fetch(functionUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
           },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ token: accessToken }),
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (response.ok && data.message) {
           setVerificationStatus('success');
           toast({
             title: "Email verified!",
@@ -41,7 +57,7 @@ const VerifyEmail = () => {
             navigate('/dashboard');
           }, 3000);
         } else {
-          throw new Error('Verification failed');
+          throw new Error(data.error || 'Verification failed');
         }
       } catch (error) {
         console.error('Verification error:', error);

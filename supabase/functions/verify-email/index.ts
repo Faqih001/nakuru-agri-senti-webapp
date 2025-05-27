@@ -2,8 +2,6 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
-console.log('Hello from verify-email endpoint!')
-
 serve(async (req) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
@@ -11,78 +9,94 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Missing or invalid authorization token');
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new Error('Authorization token required');
+    }
+
+    // Create Supabase admin client with service role key to bypass RLS
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          persistSession: false,
+        },
+      }
+    );
+
+    // Create regular client with the user's token
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         auth: {
           persistSession: false,
+          autoRefreshToken: false,
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       }
-    )
+    );
 
-    // Get the request body
-    const { token } = await req.json()
-
-    if (!token) {
-      throw new Error('Verification token is required')
+    // Get the user's info from their token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) {
+      throw new Error('Invalid user token');
     }
 
-    // Get the verification token record
-    const { data: tokenData, error: tokenError } = await supabaseClient
-      .from('email_verification_tokens')
-      .select('*')
-      .eq('token', token)
-      .single()
+    // Update user's email verification status
+    const { error: updateError } = await supabaseAdmin
+      .from('users')
+      .update({ 
+        email_verified: true,
+        status: 'active'
+      })
+      .eq('id', user.id);
 
-    if (tokenError || !tokenData) {
-      throw new Error('Invalid verification token')
-    }
-
-    // Check if token is expired
-    if (new Date(tokenData.expires_at) < new Date()) {
-      throw new Error('Verification token has expired')
-    }
-
-    // Check if token is already used
-    if (tokenData.used_at) {
-      throw new Error('Verification token has already been used')
-    }
-
-    // Begin transaction to update user and token
-    const { data, error } = await supabaseClient.rpc('verify_email', {
-      p_token: token,
-      p_user_id: tokenData.user_id
-    })
-
-    if (error) {
-      throw error
+    if (updateError) {
+      throw updateError;
     }
 
     // Log the security event
-    await supabaseClient.rpc('log_security_event', {
-      p_user_id: tokenData.user_id,
+    await supabaseAdmin.rpc('log_security_event', {
+      p_user_id: user.id,
       p_event_type: 'email_verified',
       p_ip_address: req.headers.get('x-forwarded-for') || 'unknown',
       p_user_agent: req.headers.get('user-agent') || 'unknown',
-      p_details: { token: token }
-    })
+      p_details: { email: user.email }
+    });
 
     return new Response(
-      JSON.stringify({ message: 'Email verified successfully' }),
+      JSON.stringify({ 
+        message: 'Email verified successfully',
+        user: {
+          id: user.id,
+          email: user.email,
+          email_verified: true
+        }
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
-    )
+    );
   } catch (error) {
+    console.error('Verification error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: error.status || 400,
       }
-    )
+    );
   }
-})
+});
