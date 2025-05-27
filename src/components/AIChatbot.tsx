@@ -102,11 +102,18 @@ export const AIChatbot: React.FC = () => {
     };
   }, [isMobileView]);
 
-  // Scroll to the latest message
+  // Improved scroll to latest message with smooth scrolling
   useEffect(() => {
     if (scrollAreaRef.current) {
       const scrollElement = scrollAreaRef.current;
-      scrollElement.scrollTop = scrollElement.scrollHeight;
+      
+      // Use requestAnimationFrame for smoother scrolling
+      requestAnimationFrame(() => {
+        scrollElement.scrollTo({
+          top: scrollElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
     }
   }, [messages]);
 
