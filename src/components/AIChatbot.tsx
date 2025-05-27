@@ -186,7 +186,7 @@ export const AIChatbot: React.FC = () => {
       {/* Chat modal - enhanced responsive design */}
       {isOpen && (
         <div 
-          className={`absolute bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col
+          className={`absolute bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col chatbot-modal
             ${isMobileView ? 
               'bottom-16 right-0 left-0 mx-2 max-h-[80vh]' : 
               'bottom-16 right-0 w-[350px] md:w-[400px] lg:w-[450px] h-[500px] max-h-[80vh]'}`}
