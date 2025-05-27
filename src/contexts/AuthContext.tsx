@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase, SupabaseError } from '@/integrations/supabase/client';
 // Import the serviceRoleClient for bypassing RLS policies
@@ -38,6 +38,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [profileCreationRetries, setProfileCreationRetries] = useState<Record<string, number>>({});
   const { toast } = useToast();
+  
+  // Utility function to check if service role client is properly configured
+  const validateServiceRoleClient = useCallback(async (): Promise<boolean> => {
+    // Check if the client exists
+    if (!serviceRoleClient) {
+      return false;
+    }
+    
+    try {
+      // Try a simple query that should succeed with service role permissions
+      const { error } = await serviceRoleClient.from('user_profiles').select('count', { count: 'exact', head: true });
+      
+      if (error) {
+        console.error('Service role client validation failed:', error.message);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error validating service role client:', err);
+      return false;
+    }
+  }, []);
+  
+  // Check environment setup on component mount
+  useEffect(() => {
+    // Validate service role key configuration
+    const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!serviceRoleKey || serviceRoleKey === 'your_service_role_key_here') {
+      console.warn('Supabase service role key is not configured. User profile creation may fail.');
+      
+      // Only show in development mode
+      if (import.meta.env.DEV) {
+        toast({
+          title: "Configuration Warning",
+          description: "Missing Supabase service role key. Add VITE_SUPABASE_SERVICE_ROLE_KEY to your .env file for proper functionality.",
+          variant: "warning"
+        });
+      }
+    } else {
+      // If key exists, validate that the service role client works correctly
+      validateServiceRoleClient().then(isValid => {
+        if (!isValid && import.meta.env.DEV) {
+          toast({
+            title: "API Key Validation Failed", 
+            description: "Your Supabase service role key may be invalid. Check the key in your .env file.",
+            variant: "destructive"
+          });
+        }
+      });
+    }
+  }, [toast, validateServiceRoleClient]);
 
   useEffect(() => {
     // Set up auth state listener first
@@ -149,23 +202,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
       
       // Create user profile in the database
-      // First check what columns exist in the table
-      const { data: columns, error: columnsError } = await supabase
-        .from('user_profiles')
-        .select()
-        .limit(1);
-        
-      if (columnsError) {
-        console.error('Error checking user_profiles table:', columnsError);
-        throw columnsError;
-      }
+      // First check if service role client is properly authenticated
+      const isServiceRoleValid = await validateServiceRoleClient();
       
-      // Build profile object based on available columns
-      const profileData: ExtendedUserProfile = {
-        id: userId,
-        first_name: firstName,
-        last_name: lastName
-      };
+      // Determine which client to use first based on validation result
+      const primaryClient = isServiceRoleValid ? serviceRoleClient : supabase;
+      const fallbackClient = isServiceRoleValid ? supabase : null; // No fallback if service role isn't available
+
+      try {
+        // First check what columns exist in the table
+        const { data: columns, error: columnsError } = await primaryClient!
+          .from('user_profiles')
+          .select()
+          .limit(1);
+          
+        if (columnsError) {
+          console.warn('Error checking user_profiles table with primary client:', columnsError);
+          
+          // Try fallback client if available
+          if (fallbackClient) {
+            const fallbackResponse = await fallbackClient
+              .from('user_profiles')
+              .select()
+              .limit(1);
+              
+            if (fallbackResponse.error) {
+              console.error('Both clients failed to query user_profiles table:', fallbackResponse.error);
+              throw fallbackResponse.error;
+            } else {
+              columns = fallbackResponse.data;
+            }
+          } else {
+            throw columnsError;
+          }
+        }
+        
+        // Build profile object based on available columns
+        const profileData: ExtendedUserProfile = {
+          id: userId,
+          first_name: firstName,
+          last_name: lastName
+        };
       
       // Add optional fields if they exist in the schema
       if ('email' in (columns?.[0] || {})) {
@@ -196,42 +273,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Check if service role client is available
       if (!serviceRoleClient) {
-        console.error('Service role client is not available. Check if VITE_SUPABASE_SERVICE_ROLE_KEY is set in your environment variables and restart the application.');
+        console.warn('Service role client is not available. Falling back to regular client. This may fail if RLS policies restrict insertion.');
         toast({
-          title: "Profile creation error",
-          description: "Unable to create your profile due to missing service credentials. Please contact support.",
-          variant: "destructive"
+          title: "Profile setup in progress",
+          description: "Setting up your profile with limited permissions. Some features may be restricted.",
         });
-        throw new Error('Service role client is not available for profile creation');
+        
+        // Attempt to use the regular client as fallback
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({...profileData});
+        
+        if (profileError) {
+          console.error('Error creating user profile with regular client:', profileError);
+          throw profileError;
+        }
+      } else {
+        // Use service role client to bypass RLS policies when available
+        // Spread the object into a new object to satisfy TypeScript's type requirements
+        const { error: profileError } = await serviceRoleClient
+          .from('user_profiles')
+          .insert({...profileData});
+          
+        if (profileError) {
+          console.error('Error creating user profile with service role client:', profileError);
+          throw profileError;
+        }
       }
-      
-      // Use service role client to bypass RLS policies
-      // Spread the object into a new object to satisfy TypeScript's type requirements
-      const { error: profileError } = await serviceRoleClient
-        .from('user_profiles')
-        .insert({...profileData});
 
-      if (profileError) {
-        console.error('Error creating user profile:', profileError);
-        
-        // Log detailed error for monitoring
-        logProfileCreation({
-          userId,
-          email: userEmail,
-          timestamp: new Date().toISOString(),
-          success: false,
-          errorDetails: profileError,
-          retryCount: retryCount + 1
-        });
-        
-        // Increment retry count
-        setProfileCreationRetries({
-          ...profileCreationRetries,
-          [userId]: retryCount + 1
-        });
-        
-        return false;
-      }
+      // The error handling is now moved into each client-specific block above
       
       // Log successful profile creation
       logProfileCreation({
@@ -261,6 +331,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...profileCreationRetries,
         [userId]: retryCount + 1
       });
+      
+      // If this is the first try, attempt to use the other client as fallback
+      if (retryCount === 0) {
+        console.log('Attempting fallback client for profile creation');
+        try {
+          // If service role failed, try regular client, or vice versa
+          const fallbackClient = serviceRoleClient ? supabase : (serviceRoleClient || supabase);
+          const { error: fallbackError } = await fallbackClient
+            .from('user_profiles')
+            .insert({...profileData});
+            
+          if (!fallbackError) {
+            // Success with fallback
+            logProfileCreation({
+              userId,
+              email: userEmail,
+              timestamp: new Date().toISOString(),
+              success: true,
+              retryCount: retryCount + 1
+            });
+            return true;
+          } else {
+            console.error('Fallback client also failed:', fallbackError);
+          }
+        } catch (fallbackError) {
+          console.error('Exception with fallback client:', fallbackError);
+        }
+      }
       
       return false;
     }
@@ -411,12 +509,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }, 2000);
           
-          // Still show a message to the user
-          toast({
-            title: "Profile setup in progress",
-            description: "Your account was created but profile setup is still processing. Some features may be limited until complete.",
-            variant: "destructive"
-          });
+          // Check if the service role key is missing
+          if (!import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY === 'your_service_role_key_here') {
+            console.error('Missing or invalid Supabase service role key. Profile creation requires proper configuration.');
+            toast({
+              title: "Configuration Error",
+              description: "Server is missing required authentication keys. Please add a valid VITE_SUPABASE_SERVICE_ROLE_KEY to your .env file.",
+              variant: "destructive"
+            });
+          } else {
+            // General failure message
+            toast({
+              title: "Profile setup in progress",
+              description: "Your account was created but profile setup is still processing. Some features may be limited until complete.",
+              variant: "warning"
+            });
+          }
         }
         
         // Flag to show profile completion dialog
