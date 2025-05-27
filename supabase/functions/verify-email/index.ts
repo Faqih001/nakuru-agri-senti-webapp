@@ -92,7 +92,9 @@ serve(async (req) => {
           id: user.id,
           email: user.email,
           email_verified: true
-        }
+        },
+        // Include the redirect URL for frontend to use
+        redirectUrl: 'https://nakuru-agri-senti-webapp.vercel.app/auth'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

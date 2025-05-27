@@ -7,10 +7,12 @@ This guide will help you diagnose and fix common authentication issues with Supa
 ### 1. Email Verification Problems
 
 **Symptoms:**
+
 - Users cannot log in after signing up
 - You see errors like "Email not confirmed" or "Email not verified"
 
 **Solutions:**
+
 - Email verification has been disabled in the application code
 - If you're still experiencing issues, use the `email-confirmation-test.html` tool to manually verify email addresses
 - Check the Supabase dashboard to ensure email confirmation is disabled in the project settings
@@ -18,10 +20,12 @@ This guide will help you diagnose and fix common authentication issues with Supa
 ### 2. Connection Issues
 
 **Symptoms:**
+
 - Error messages containing "ERR_NAME_NOT_RESOLVED", "Failed to fetch", or "Connection refused"
 - Authentication operations fail but the internet connection works for other sites
 
 **Solutions:**
+
 - Run `./debug-connection.sh` to diagnose DNS and connectivity issues
 - Check if your network blocks the Supabase domain
 - Try using a different DNS server (like 8.8.8.8) if your default DNS has issues
@@ -30,11 +34,13 @@ This guide will help you diagnose and fix common authentication issues with Supa
 ### 3. Service Role Authentication Issues
 
 **Symptoms:**
+
 - Profile creation fails after signup
 - Error messages related to JWT token or authorization
 - Error messages mentioning "role" claim or permission denied
 
 **Solutions:**
+
 - Run `./debug-jwt.sh` to check for JWT token format issues
 - Ensure your Supabase service role key has "role": "service_role" (not "rose": "service_role")
 - Verify you're using the correct service role key from your Supabase dashboard
@@ -49,6 +55,7 @@ Run the full test suite to validate all authentication components:
 ```
 
 This will check:
+
 1. Basic connectivity to Supabase
 2. JWT token format and claims
 3. Authentication with anon key
@@ -82,4 +89,4 @@ If you're still experiencing issues after trying these solutions:
 1. Check the browser console for detailed error messages
 2. Look at the Network tab in developer tools for failed requests
 3. Check the Supabase project logs in your dashboard
-4. Contact support at support@agrisenti.com with the error details and results of the debugging tools
+4. Contact support at <support@agrisenti.com> with the error details and results of the debugging tools

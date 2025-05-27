@@ -647,14 +647,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
       }
       
+      // Configure sign up with email verification enabled
+      // Determine the appropriate redirect URL
+      const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
+      const redirectUrl = import.meta.env.PROD 
+        ? `${productionUrl}/verify-email` 
+        : `${window.location.origin}/verify-email`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: metadata,
-          emailRedirectTo: window.location.origin + '/dashboard',
-          // Disable email verification completely
-          emailConfirm: false
+          emailRedirectTo: redirectUrl,
+          // Enable email verification for production
+          emailConfirm: true
         }
       });
 
@@ -662,9 +669,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Create a user profile record if the user was created successfully
       if (data.user) {
-        // Auto-confirm the user's email regardless of environment
-        // This ensures email verification is completely disabled
-        if (serviceRoleClient) {
+        // Auto-confirm the user's email only in development mode
+        // In production, we'll use proper email verification
+        if (serviceRoleClient && import.meta.env.DEV) {
+          console.log('Development mode detected - auto-confirming email');
           try {
             // First attempt: Update email_confirmed_at directly
             const { error: directConfirmError } = await serviceRoleClient.auth.admin.updateUserById(
@@ -714,6 +722,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           } catch (confirmErr) {
             console.error('Error during email confirmation bypass:', confirmErr);
           }
+        } else if (!import.meta.env.DEV) {
+          // In production, let the user verify their email normally
+          console.log('Production mode - sending email verification');
         }
         
         // Wait a bit to allow the auth system to fully create the user
@@ -759,12 +770,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setShowProfileCompletion(true);
       }
 
-      // No need to check for email confirmation anymore since it's disabled
+      // Provide appropriate message based on environment
       if (data.user) {
-        toast({
-          title: "Account created",
-          description: "Your account has been created successfully. You can now log in.",
-        });
+        if (import.meta.env.DEV) {
+          toast({
+            title: "Account created",
+            description: "Your account has been created successfully. You can now log in.",
+          });
+        } else {
+          toast({
+            title: "Account created",
+            description: "Please check your email to verify your account. A verification link has been sent to your inbox.",
+          });
+        }
       }
 
       return { data, error: null };

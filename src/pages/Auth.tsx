@@ -16,9 +16,10 @@ const Auth = () => {
   const { user, signIn, signUp, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useState(new URLSearchParams(window.location.search));
   
   const [loginData, setLoginData] = useState({
-    email: "",
+    email: searchParams.get('email') || "",
     password: ""
   });
 
@@ -49,7 +50,23 @@ const Auth = () => {
     if (user && !authLoading) {
       navigate("/dashboard");
     }
-  }, [user, authLoading, navigate]);
+    
+    // Check if user is coming from verification
+    const verificationSuccess = searchParams.get('verified') === 'true';
+    const email = searchParams.get('email');
+    
+    if (verificationSuccess && email) {
+      toast({
+        title: "Email Verified",
+        description: "Your email has been verified. You can now log in with your credentials.",
+        variant: "success"
+      });
+      
+      // Pre-fill the email field
+      setLoginData(prev => ({ ...prev, email }));
+      setActiveTab("login");
+    }
+  }, [user, authLoading, navigate, searchParams, toast]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
