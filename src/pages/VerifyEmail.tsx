@@ -52,9 +52,22 @@ const VerifyEmail = () => {
             description: "Your email has been successfully verified.",
           });
           
-          // Redirect to dashboard after 3 seconds
+          // Redirect to login page with verified flag and email after 3 seconds
           setTimeout(() => {
-            navigate('/dashboard');
+            // Extract email and redirectUrl from the response
+            const userEmail = data.user?.email || '';
+            const redirectUrl = data.redirectUrl || 'https://nakuru-agri-senti-webapp.vercel.app/auth';
+            
+            // Construct the full URL with query parameters
+            const redirectWithParams = `${redirectUrl}?verified=true&email=${encodeURIComponent(userEmail)}`;
+            
+            // Use window.location for full page redirect to external URL if needed
+            if (redirectUrl.startsWith('http')) {
+              window.location.href = redirectWithParams;
+            } else {
+              // Use navigate for internal routing
+              navigate(redirectWithParams);
+            }
           }, 3000);
         } else {
           throw new Error(data.error || 'Verification failed');
@@ -83,8 +96,8 @@ const VerifyEmail = () => {
     success: {
       icon: <Check className="w-12 h-12 text-green-600" />,
       title: "Email Verified",
-      description: "Your email has been successfully verified. You'll be redirected to the dashboard shortly.",
-      buttonText: "Go to Dashboard"
+      description: "Your email has been successfully verified. You'll be redirected to the login page shortly.",
+      buttonText: "Go to Login"
     },
     error: {
       icon: <XCircle className="w-12 h-12 text-red-600" />,
@@ -120,14 +133,14 @@ const VerifyEmail = () => {
             {content.buttonText && (
               <Button
                 className="w-full bg-green-600 hover:bg-green-700"
-                onClick={() => navigate(verificationStatus === 'success' ? '/dashboard' : '/resend-verification')}
+                onClick={() => navigate(verificationStatus === 'success' ? '/auth' : '/resend-verification')}
               >
                 {content.buttonText}
               </Button>
             )}
 
             <Link 
-              to="/login" 
+              to="/auth" 
               className="inline-flex items-center text-sm text-green-600 hover:text-green-700"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
