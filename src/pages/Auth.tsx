@@ -59,7 +59,7 @@ const Auth = () => {
       toast({
         title: "Email Verified",
         description: "Your email has been verified. You can now log in with your credentials.",
-        variant: "success"
+        variant: "default"
       });
       
       // Pre-fill the email field

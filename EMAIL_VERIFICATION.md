@@ -58,13 +58,13 @@ The system behaves differently based on the environment:
 
 - Email verification can be bypassed (auto-confirmed)
 - Redirects happen within the local development server
-- URLs use the local origin (e.g. http://localhost:5173)
+- URLs use the local origin (e.g. <http://localhost:5173>)
 
 ### Production Environment
 
 - Full email verification flow is enforced
-- All redirects use the production URL: https://nakuru-agri-senti-webapp.vercel.app/
-- Email verification redirects to: https://nakuru-agri-senti-webapp.vercel.app/auth
+- All redirects use the production URL: <https://nakuru-agri-senti-webapp.vercel.app/>
+- Email verification redirects to: <https://nakuru-agri-senti-webapp.vercel.app/auth>
 
 ## Troubleshooting
 
@@ -96,12 +96,17 @@ Use the provided test script to test the email verification flow:
 ```
 
 This script:
+
 1. Creates a test user
 2. Simulates email verification
 3. Tests signing in with the verified user
 4. Tests the verify-email function
+5. Validates the redirect URL points to the correct production URL
 
 ## Production URL
 
 The production application is deployed at:
-https://nakuru-agri-senti-webapp.vercel.app/
+
+[https://nakuru-agri-senti-webapp.vercel.app/](https://nakuru-agri-senti-webapp.vercel.app/)
+
+All redirects and verification links should use this base URL in production.
