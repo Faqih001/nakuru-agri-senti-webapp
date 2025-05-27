@@ -658,10 +658,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email,
         password,
         options: {
-          data: metadata,
-          emailRedirectTo: redirectUrl,
-          // Enable email verification for production
-          emailConfirm: true
+          data: {
+            ...metadata,
+            // Store email confirmation preference in metadata
+            email_verification_requested: true
+          },
+          emailRedirectTo: redirectUrl
         }
       });
 
@@ -674,10 +676,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (serviceRoleClient && import.meta.env.DEV) {
           console.log('Development mode detected - auto-confirming email');
           try {
-            // First attempt: Update email_confirmed_at directly
+            // First attempt: Update with app_metadata to confirm email
             const { error: directConfirmError } = await serviceRoleClient.auth.admin.updateUserById(
               data.user.id,
-              { email_confirmed_at: new Date().toISOString() }
+              { app_metadata: { email_confirmed: true } }
             );
             
             if (directConfirmError) {
