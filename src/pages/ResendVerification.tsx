@@ -29,8 +29,9 @@ const ResendVerification = () => {
     
     try {
       // Get the base URL for redirect
+      const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
       const baseUrl = import.meta.env.PROD 
-        ? 'https://nakuru-agri-senti-webapp.vercel.app' 
+        ? productionUrl
         : window.location.origin;
         
       const { error } = await supabase.auth.resend({
@@ -61,8 +62,8 @@ const ResendVerification = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0">
+    <div className="container mx-auto py-16 px-4 flex items-center justify-center">
+      <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <div className="bg-green-600 p-3 rounded-full">
