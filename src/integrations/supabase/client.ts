@@ -26,13 +26,29 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
   console.log('[Supabase Auth Event]', event, session?.user?.id);
 });
 
+// Define a type for Supabase errors
+export interface SupabaseError {
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+  status?: number;
+  error?: string;
+  statusText?: string;
+  data?: unknown;
+}
+
 // Helper function to log Supabase errors in detail
-export const logSupabaseError = (error: any, context: string) => {
+export const logSupabaseError = (error: unknown, context: string) => {
+  const errorObj = error as SupabaseError;
+  
   console.error(`[Supabase Error] ${context}:`, {
-    message: error?.message,
-    details: error?.details,
-    hint: error?.hint,
-    code: error?.code
+    message: errorObj?.message,
+    details: errorObj?.details,
+    hint: errorObj?.hint,
+    code: errorObj?.code,
+    status: errorObj?.status,
+    error: errorObj?.error
   });
 };
 
