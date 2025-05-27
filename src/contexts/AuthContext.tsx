@@ -69,6 +69,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      // Create a user profile record if the user was created successfully
+      if (data.user) {
+        // Extract user details from metadata
+        const { full_name, location, farm_size } = metadata as any;
+        const firstName = full_name ? full_name.split(' ')[0] : '';
+        const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
+        
+        // Create user profile in the database
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            username: data.user.email?.split('@')[0],
+            password_hash: '', // This is managed by Supabase Auth
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: '',
+            account_type: 'farmer',
+            email_verified: false,
+          });
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          toast({
+            title: "Profile creation failed",
+            description: "Account created but profile setup failed. Please contact support.",
+            variant: "destructive"
+          });
+        }
+      }
+
       // Check if user needs email confirmation
       if (data.user && !data.session) {
         toast({
