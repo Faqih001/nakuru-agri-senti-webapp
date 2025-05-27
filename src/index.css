@@ -109,3 +109,21 @@
     animation-delay: 0.2s;
   }
 }
+
+/* Chatbot responsive styles */
+.chatbot-modal {
+  transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 640px) {
+  .chatbot-modal {
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+/* Improve textarea behavior on mobile */
+@media (max-height: 650px) {
+  .chatbot-modal {
+    max-height: 70vh !important;
+  }
+}
