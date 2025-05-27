@@ -56,7 +56,8 @@ const VerifyEmail = () => {
           setTimeout(() => {
             // Extract email and redirectUrl from the response
             const userEmail = data.user?.email || '';
-            const redirectUrl = data.redirectUrl || 'https://nakuru-agri-senti-webapp.vercel.app/auth';
+            const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
+            const redirectUrl = data.redirectUrl || (import.meta.env.PROD ? `${productionUrl}/auth` : '/auth');
             
             // Construct the full URL with query parameters
             const redirectWithParams = `${redirectUrl}?verified=true&email=${encodeURIComponent(userEmail)}`;

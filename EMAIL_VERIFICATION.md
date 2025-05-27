@@ -58,11 +58,13 @@ The system behaves differently based on the environment:
 
 - Email verification can be bypassed (auto-confirmed)
 - Redirects happen within the local development server
+- URLs use the local origin (e.g. http://localhost:5173)
 
 ### Production Environment
 
 - Full email verification flow is enforced
-- Redirects to the production URL: https://nakuru-agri-senti-webapp.vercel.app/auth
+- All redirects use the production URL: https://nakuru-agri-senti-webapp.vercel.app/
+- Email verification redirects to: https://nakuru-agri-senti-webapp.vercel.app/auth
 
 ## Troubleshooting
 
