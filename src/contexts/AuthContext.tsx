@@ -31,7 +31,8 @@ interface ProfileCreationLog {
   retryCount: number;
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// The React.FC type enforces that the component returns JSX
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast({
           title: "Configuration Warning",
           description: "Missing Supabase service role key. Add VITE_SUPABASE_SERVICE_ROLE_KEY to your .env file for proper functionality.",
-          variant: "warning"
+          variant: "destructive"
         });
       }
     } else {
@@ -209,9 +210,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const primaryClient = isServiceRoleValid ? serviceRoleClient : supabase;
       const fallbackClient = isServiceRoleValid ? supabase : null; // No fallback if service role isn't available
 
+      let columnsData;
       try {
         // First check what columns exist in the table
-        const { data: columns, error: columnsError } = await primaryClient!
+        const { data: initialColumns, error: columnsError } = await primaryClient!
           .from('user_profiles')
           .select()
           .limit(1);
@@ -230,12 +232,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.error('Both clients failed to query user_profiles table:', fallbackResponse.error);
               throw fallbackResponse.error;
             } else {
-              columns = fallbackResponse.data;
+              columnsData = fallbackResponse.data;
             }
           } else {
             throw columnsError;
           }
+        } else {
+          columnsData = initialColumns;
         }
+      } catch (error) {
+        console.error('Error checking table schema:', error);
+        // Set default empty object for columns data if error occurs
+        columnsData = [{}];
+      }
         
         // Build profile object based on available columns
         const profileData: ExtendedUserProfile = {
@@ -245,27 +254,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       
       // Add optional fields if they exist in the schema
-      if ('email' in (columns?.[0] || {})) {
+      if ('email' in (columnsData?.[0] || {})) {
         profileData.email = userEmail;
       }
       
-      if ('username' in (columns?.[0] || {})) {
+      if ('username' in (columnsData?.[0] || {})) {
         profileData.username = userEmail?.split('@')[0] || '';
       }
       
-      if ('phone_number' in (columns?.[0] || {})) {
+      if ('phone_number' in (columnsData?.[0] || {})) {
         profileData.phone_number = '';
       }
       
-      if ('account_type' in (columns?.[0] || {})) {
+      if ('account_type' in (columnsData?.[0] || {})) {
         profileData.account_type = 'farmer';
       }
       
-      if ('email_verified' in (columns?.[0] || {})) {
+      if ('email_verified' in (columnsData?.[0] || {})) {
         profileData.email_verified = false;
       }
       
-      if ('status' in (columns?.[0] || {})) {
+      if ('status' in (columnsData?.[0] || {})) {
         profileData.status = 'pending';
       }
       
@@ -336,11 +345,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (retryCount === 0) {
         console.log('Attempting fallback client for profile creation');
         try {
+          // Make sure profileData is still available for this scope
+          const fallbackProfileData = {
+            id: userId,
+            first_name: metadata.full_name ? metadata.full_name.split(' ')[0] : '',
+            last_name: metadata.full_name ? metadata.full_name.split(' ').slice(1).join(' ') : '',
+            email: userEmail,
+            username: userEmail?.split('@')[0] || '',
+            account_type: 'farmer',
+            email_verified: false,
+            status: 'pending'
+          };
+          
           // If service role failed, try regular client, or vice versa
           const fallbackClient = serviceRoleClient ? supabase : (serviceRoleClient || supabase);
           const { error: fallbackError } = await fallbackClient
             .from('user_profiles')
-            .insert({...profileData});
+            .insert({...fallbackProfileData});
             
           if (!fallbackError) {
             // Success with fallback
@@ -523,7 +544,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             toast({
               title: "Profile setup in progress",
               description: "Your account was created but profile setup is still processing. Some features may be limited until complete.",
-              variant: "warning"
+              variant: "default"
             });
           }
         }
