@@ -117,6 +117,51 @@ export const AIChatbot: React.FC = () => {
     }
   }, [messages]);
 
+  // Add support for touch gestures (swipe down to close on mobile)
+  useEffect(() => {
+    if (!isOpen || !isMobileView) return;
+    
+    let startY = 0;
+    let currentY = 0;
+    const minSwipeDistance = 100; // Min distance required for swipe to register
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      startY = e.touches[0].clientY;
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      currentY = e.touches[0].clientY;
+    };
+    
+    const handleTouchEnd = () => {
+      const diff = currentY - startY;
+      // If swipe down distance is greater than minimum threshold, close the modal
+      if (diff > minSwipeDistance) {
+        setIsOpen(false);
+      }
+      
+      // Reset coordinates
+      startY = 0;
+      currentY = 0;
+    };
+    
+    // Only add the event listeners for the modal header where the swipe gesture is expected
+    const modalHeader = document.querySelector('.chatbot-modal > div:first-child');
+    if (modalHeader) {
+      modalHeader.addEventListener('touchstart', handleTouchStart);
+      modalHeader.addEventListener('touchmove', handleTouchMove);
+      modalHeader.addEventListener('touchend', handleTouchEnd);
+    }
+    
+    return () => {
+      if (modalHeader) {
+        modalHeader.removeEventListener('touchstart', handleTouchStart);
+        modalHeader.removeEventListener('touchmove', handleTouchMove);
+        modalHeader.removeEventListener('touchend', handleTouchEnd);
+      }
+    };
+  }, [isOpen, isMobileView]);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
@@ -178,6 +223,60 @@ export const AIChatbot: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Handle keyboard shortcuts for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Close chatbot with Escape key if it's open
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+      
+      // Open chatbot with Alt+C
+      if ((e.altKey && e.key === 'c') || (e.altKey && e.key === 'C')) {
+        e.preventDefault();
+        setIsOpen(prev => !prev);
+        
+        // If opening, focus the textarea after a short delay
+        if (!isOpen) {
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.focus();
+            }
+          }, 100);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  // Focus textarea when chat opens
+  useEffect(() => {
+    if (isOpen && textareaRef.current) {
+      // Short delay to ensure the modal is fully rendered
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Enhanced responsiveness for orientation changes
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsMobileView(true);
+      } else {
+        setIsMobileView(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8 z-50">
