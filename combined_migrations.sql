@@ -6,6 +6,32 @@ CREATE TYPE weather_type AS ENUM ('sunny', 'rainy', 'cloudy', 'partly_cloudy');
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'cancelled');
 CREATE TYPE subscription_tier AS ENUM ('basic', 'premium', 'enterprise');
 
+-- Add explicit foreign key between user_profiles and auth.users
+DO $$
+BEGIN
+  -- Check if the foreign key exists
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'user_profiles_id_fkey' 
+    AND table_name = 'user_profiles'
+  ) THEN
+    -- Add the foreign key constraint to auth.users
+    BEGIN
+      ALTER TABLE user_profiles
+        ADD CONSTRAINT user_profiles_id_fkey
+        FOREIGN KEY (id) 
+        REFERENCES auth.users(id)
+        ON DELETE CASCADE;
+      
+      RAISE NOTICE 'Added foreign key constraint from user_profiles.id to auth.users.id';
+    EXCEPTION WHEN OTHERS THEN
+      RAISE NOTICE 'Error adding foreign key constraint: %', SQLERRM;
+    END;
+  ELSE
+    RAISE NOTICE 'Foreign key constraint user_profiles_id_fkey already exists';
+  END IF;
+END $$;
+
 -- Create farms table
 CREATE TABLE farms (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
