@@ -9,11 +9,12 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { CropAssistant } from "@/components/CropAssistant";
 import { DiseaseDetection } from "@/components/DiseaseDetection";
 import { MarketDashboard } from "@/components/MarketDashboard";
+import { ProfileCompletionDialog } from "@/components/ProfileCompletionDialog";
 import { Sprout, Camera, TrendingUp, Settings, Bell, LogOut, User, BarChart, Calendar, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 const Dashboard = () => {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, loading, showProfileCompletion } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("assistant");
 
@@ -48,6 +49,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
+      {/* Profile Completion Dialog */}
+      <ProfileCompletionDialog open={showProfileCompletion} />
+      
       {/* Modern Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-green-200/50 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">

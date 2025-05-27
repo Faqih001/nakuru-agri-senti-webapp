@@ -19,16 +19,28 @@ interface ExtendedUserProfile extends UserProfileInsert {
   status?: string;
 }
 
+// Add interface for tracking profile creation status
+interface ProfileCreationLog {
+  userId: string;
+  email: string;
+  timestamp: string;
+  success: boolean;
+  errorDetails?: unknown;
+  retryCount: number;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+  const [profileCreationRetries, setProfileCreationRetries] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
@@ -40,6 +52,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             title: "Account created successfully!",
             description: "Welcome to AgriSenti. You can now start using our smart farming tools.",
           });
+          
+          // Flag to show profile completion dialog for new users
+          if (session?.user) {
+            setShowProfileCompletion(true);
+          }
         } else if (event === AuthEvents.SIGNED_IN) {
           toast({
             title: "Welcome back!",
@@ -59,119 +76,177 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, [toast]);
 
-  const signUp = async (email: string, password: string, metadata: UserMetadata = {}): Promise<SignUpResponse> => {
+  // Function to log profile creation events for monitoring
+  const logProfileCreation = (log: ProfileCreationLog): void => {
+    // Store logs for monitoring - in production this could send to a monitoring service
+    console.log('[PROFILE_CREATION_LOG]', log);
+    
+    // In a real app, you might want to persist these logs
+    // or send them to an analytics/monitoring service
     try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata,
-          emailRedirectTo: window.location.origin + '/dashboard'
-        }
-      });
-
-      if (error) throw error;
-
-      // Create a user profile record if the user was created successfully
-      if (data.user) {
-        try {
-          // Extract user details from metadata
-          const { full_name, location, farm_size } = metadata;
-          const firstName = full_name ? full_name.split(' ')[0] : '';
-          const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
-          
-          // Create user profile in the database
-          // First check what columns exist in the table
-          const { data: columns, error: columnsError } = await supabase
-            .from('user_profiles')
-            .select()
-            .limit(1);
-            
-          if (columnsError) {
-            console.error('Error checking user_profiles table:', columnsError);
-          }
-          
-          // Build profile object based on available columns
-          const profileData: ExtendedUserProfile = {
-            id: data.user.id,
-            first_name: firstName,
-            last_name: lastName
-          };
-          
-          // Add optional fields if they exist in the schema
-          if ('email' in (columns?.[0] || {})) {
-            profileData.email = data.user.email;
-          }
-          
-          if ('username' in (columns?.[0] || {})) {
-            profileData.username = data.user.email?.split('@')[0] || '';
-          }
-          
-          if ('phone_number' in (columns?.[0] || {})) {
-            profileData.phone_number = '';
-          }
-          
-          if ('account_type' in (columns?.[0] || {})) {
-            profileData.account_type = 'farmer';
-          }
-          
-          if ('email_verified' in (columns?.[0] || {})) {
-            profileData.email_verified = false;
-          }
-          
-          if ('status' in (columns?.[0] || {})) {
-            profileData.status = 'pending';
-          }
-          
-          console.log('Creating user profile with data:', profileData);
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert(profileData);
-
-          if (profileError) {
-            console.error('Error creating user profile:', profileError);
-            
-            // Log detailed error for debugging
-            console.log('Profile insertion failed. Details:', { 
-              error: profileError as SupabaseError,
-              errorMessage: (profileError as SupabaseError).message,
-              details: (profileError as SupabaseError).details,
-              hint: (profileError as SupabaseError).hint,
-              code: (profileError as SupabaseError).code
-            });
-            
-            toast({
-              title: "Profile creation failed",
-              description: "Account created but profile setup failed. Please contact support.",
-              variant: "destructive"
-            });
-          }
-        } catch (error) {
-          console.error('Exception during profile creation:', error);
-        }
+      // For now, just log to console and to localStorage for basic persistence
+      const logs = JSON.parse(localStorage.getItem('profile_creation_logs') || '[]');
+      logs.push(log);
+      localStorage.setItem('profile_creation_logs', JSON.stringify(logs.slice(-20))); // Keep last 20 logs
+    } catch (err) {
+      console.error('Error storing profile creation logs:', err);
+    }
+  };
+  
+  // Function to validate user metadata
+  const validateUserMetadata = (metadata: UserMetadata): { valid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    
+    // Check for email format if provided in metadata
+    if (metadata.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(metadata.email)) {
+      errors.push('Invalid email format');
+    }
+    
+    // Validate full name if provided
+    if (metadata.full_name) {
+      if (metadata.full_name.length < 2) {
+        errors.push('Full name is too short');
       }
+      if (metadata.full_name.length > 100) {
+        errors.push('Full name is too long');
+      }
+      if (/[^a-zA-Z\s\-']/.test(metadata.full_name)) {
+        errors.push('Full name contains invalid characters');
+      }
+    }
+    
+    // Add more validations as needed
+    
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  };
 
-      // Check if user needs email confirmation
-      if (data.user && !data.session) {
-        toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link. Please click it to activate your account.",
+  // Function to create user profile with retry mechanism
+  const createUserProfile = async (userId: string, userEmail: string, metadata: UserMetadata): Promise<boolean> => {
+    const maxRetries = 3;
+    const retryCount = profileCreationRetries[userId] || 0;
+    
+    if (retryCount >= maxRetries) {
+      logProfileCreation({
+        userId,
+        email: userEmail,
+        timestamp: new Date().toISOString(),
+        success: false,
+        errorDetails: { message: 'Max retries exceeded' },
+        retryCount
+      });
+      return false;
+    }
+    
+    try {
+      // Extract user details from metadata
+      const { full_name, location, farm_size } = metadata;
+      const firstName = full_name ? full_name.split(' ')[0] : '';
+      const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
+      
+      // Create user profile in the database
+      // First check what columns exist in the table
+      const { data: columns, error: columnsError } = await supabase
+        .from('user_profiles')
+        .select()
+        .limit(1);
+        
+      if (columnsError) {
+        console.error('Error checking user_profiles table:', columnsError);
+        throw columnsError;
+      }
+      
+      // Build profile object based on available columns
+      const profileData: ExtendedUserProfile = {
+        id: userId,
+        first_name: firstName,
+        last_name: lastName
+      };
+      
+      // Add optional fields if they exist in the schema
+      if ('email' in (columns?.[0] || {})) {
+        profileData.email = userEmail;
+      }
+      
+      if ('username' in (columns?.[0] || {})) {
+        profileData.username = userEmail?.split('@')[0] || '';
+      }
+      
+      if ('phone_number' in (columns?.[0] || {})) {
+        profileData.phone_number = '';
+      }
+      
+      if ('account_type' in (columns?.[0] || {})) {
+        profileData.account_type = 'farmer';
+      }
+      
+      if ('email_verified' in (columns?.[0] || {})) {
+        profileData.email_verified = false;
+      }
+      
+      if ('status' in (columns?.[0] || {})) {
+        profileData.status = 'pending';
+      }
+      
+      console.log('Creating user profile with data:', profileData);
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert(profileData);
+
+      if (profileError) {
+        console.error('Error creating user profile:', profileError);
+        
+        // Log detailed error for monitoring
+        logProfileCreation({
+          userId,
+          email: userEmail,
+          timestamp: new Date().toISOString(),
+          success: false,
+          errorDetails: profileError,
+          retryCount: retryCount + 1
         });
+        
+        // Increment retry count
+        setProfileCreationRetries({
+          ...profileCreationRetries,
+          [userId]: retryCount + 1
+        });
+        
+        return false;
       }
-
-      return { data, error: null };
-    } catch (error) {
-      console.error('Sign up error:', error);
-      const authError = error as AuthError;
-      toast({
-        title: "Sign up failed",
-        description: authError.message,
-        variant: "destructive"
+      
+      // Log successful profile creation
+      logProfileCreation({
+        userId,
+        email: userEmail,
+        timestamp: new Date().toISOString(),
+        success: true,
+        retryCount
       });
-      return { data: null, error: authError };
-    } finally {
-      setLoading(false);
+      
+      return true;
+    } catch (error) {
+      console.error('Exception during profile creation:', error);
+      
+      // Log exception for monitoring
+      logProfileCreation({
+        userId,
+        email: userEmail,
+        timestamp: new Date().toISOString(),
+        success: false,
+        errorDetails: error,
+        retryCount: retryCount + 1
+      });
+      
+      // Increment retry count
+      setProfileCreationRetries({
+        ...profileCreationRetries,
+        [userId]: retryCount + 1
+      });
+      
+      return false;
     }
   };
 
@@ -227,13 +302,144 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Update auth context type with needed functions
+  const completeUserProfile = async (profileData: Partial<UserProfile>): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update(profileData)
+        .eq('id', user.id);
+        
+      if (error) {
+        console.error('Error updating user profile:', error);
+        toast({
+          title: "Profile update failed",
+          description: "Could not update your profile. Please try again.",
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+      
+      // Hide the profile completion dialog after successful update
+      setShowProfileCompletion(false);
+      
+      return true;
+    } catch (error) {
+      console.error('Exception during profile update:', error);
+      toast({
+        title: "Profile update failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+  
+  const hideProfileCompletion = () => {
+    setShowProfileCompletion(false);
+  };
+  
+  // Improved signup function with error handling and retry mechanism
+  const signUp = async (email: string, password: string, metadata: UserMetadata = {}): Promise<SignUpResponse> => {
+    try {
+      setLoading(true);
+      
+      // Validate metadata first
+      const validation = validateUserMetadata(metadata);
+      if (!validation.valid) {
+        const errorMessage = `Invalid user data: ${validation.errors.join(', ')}`;
+        toast({
+          title: "Invalid user data",
+          description: errorMessage,
+          variant: "destructive"
+        });
+        return { 
+          data: null, 
+          error: new AuthError(errorMessage)
+        };
+      }
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata,
+          emailRedirectTo: window.location.origin + '/dashboard'
+        }
+      });
+
+      if (error) throw error;
+
+      // Create a user profile record if the user was created successfully
+      if (data.user) {
+        // Try to create user profile with retry mechanism
+        const profileCreated = await createUserProfile(data.user.id, email, metadata);
+        
+        if (!profileCreated) {
+          // Schedule a background retry after a delay if profile creation fails
+          setTimeout(async () => {
+            // Try again after 2 seconds
+            const retryResult = await createUserProfile(data.user?.id || '', email, metadata);
+            if (!retryResult) {
+              // Final attempt after 5 more seconds
+              setTimeout(async () => {
+                await createUserProfile(data.user?.id || '', email, metadata);
+              }, 5000);
+            }
+          }, 2000);
+          
+          // Still show a message to the user
+          toast({
+            title: "Profile setup in progress",
+            description: "Your account was created but profile setup is still processing. Some features may be limited until complete.",
+            variant: "destructive"
+          });
+        }
+        
+        // Flag to show profile completion dialog
+        setShowProfileCompletion(true);
+      }
+
+      // Check if user needs email confirmation
+      if (data.user && !data.session) {
+        toast({
+          title: "Check your email",
+          description: "We've sent you a confirmation link. Please click it to activate your account.",
+        });
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      const authError = error as AuthError;
+      toast({
+        title: "Sign up failed",
+        description: authError.message,
+        variant: "destructive"
+      });
+      return { data: null, error: authError };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const contextValue: AuthContextType = {
     user,
     session,
     loading,
+    showProfileCompletion,
     signUp,
     signIn,
-    signOut
+    signOut,
+    completeUserProfile,
+    hideProfileCompletion
   };
 
   return (
