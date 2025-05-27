@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sprout, Eye, EyeOff, Mail, Lock, User, MapPin, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 
 const Auth = () => {
   const { user, signIn, signUp, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   
   const [loginData, setLoginData] = useState({
@@ -57,6 +59,9 @@ const Auth = () => {
     
     if (!error) {
       navigate("/dashboard");
+    } else {
+      console.log("Login error:", error.message);
+      // Error is already handled in AuthContext with toast messages
     }
     
     setLoading(prev => ({ ...prev, login: false }));
@@ -66,22 +71,49 @@ const Auth = () => {
     e.preventDefault();
     
     if (signupData.password !== signupData.confirmPassword) {
+      // Add toast message for password mismatch
+      toast({
+        title: "Password Error",
+        description: "Passwords do not match. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!signupData.location || !signupData.farmSize) {
+      toast({
+        title: "Missing Information",
+        description: "Please select your location and farm size.",
+        variant: "destructive"
+      });
       return;
     }
 
     setLoading(prev => ({ ...prev, signup: true }));
 
-    const { error } = await signUp(signupData.email, signupData.password, {
-      full_name: signupData.fullName,
-      location: signupData.location,
-      farm_size: signupData.farmSize
-    });
-    
-    if (!error) {
-      navigate("/dashboard");
+    try {
+      const { error } = await signUp(signupData.email, signupData.password, {
+        full_name: signupData.fullName,
+        location: signupData.location,
+        farm_size: signupData.farmSize
+      });
+      
+      if (!error) {
+        navigate("/dashboard");
+      } else {
+        console.log("Signup error:", error.message);
+        // Error is already handled in AuthContext with toast messages
+      }
+    } catch (err) {
+      console.error("Unexpected signup error:", err);
+      toast({
+        title: "Sign Up Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(prev => ({ ...prev, signup: false }));
     }
-    
-    setLoading(prev => ({ ...prev, signup: false }));
   };
 
   if (authLoading) {

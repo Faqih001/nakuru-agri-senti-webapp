@@ -8,16 +8,17 @@ export interface UserMetadata {
 
 export interface UserProfile {
   id: string;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  account_type: 'farmer' | 'admin' | 'expert';
-  email_verified: boolean;
-  status: 'pending' | 'active' | 'suspended';
-  created_at?: string;
-  updated_at?: string;
+  email?: string;
+  username?: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number?: string;
+  account_type?: string;
+  email_verified?: boolean;
+  status?: string;
+  job_title?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface SignUpResponse {

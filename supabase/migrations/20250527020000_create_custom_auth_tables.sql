@@ -104,7 +104,8 @@ CREATE INDEX idx_user_sessions_token ON user_sessions(session_token);
 CREATE INDEX idx_user_sessions_user ON user_sessions(user_id);
 CREATE INDEX idx_email_verification_token ON email_verification_tokens(token);
 CREATE INDEX idx_phone_verification_user ON phone_verification_tokens(user_id, phone_number);
-CREATE INDEX idx_password_reset_token ON password_reset_tokens(token);
+-- Index already created in previous migration
+-- CREATE INDEX idx_password_reset_token ON password_reset_tokens(token);
 CREATE INDEX idx_security_audit_user_time ON security_audit_log(user_id, created_at DESC);
 
 -- Create or replace function to hash password

@@ -1,9 +1,23 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SupabaseError } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AuthContextType, UserMetadata, SignUpResponse, SignInResponse, UserProfile } from './types';
 import { AuthContext, AuthEvents } from './auth';
+import { Database } from '@/integrations/supabase/types';
+
+// Define basic type that matches Supabase structure
+type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert'];
+
+// Define extended type for dynamic fields (matches our migration)
+interface ExtendedUserProfile extends UserProfileInsert {
+  email?: string;
+  username?: string;
+  phone_number?: string;
+  account_type?: string;
+  email_verified?: boolean;
+  status?: string;
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -61,33 +75,80 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Create a user profile record if the user was created successfully
       if (data.user) {
-        // Extract user details from metadata
-        const { full_name, location, farm_size } = metadata;
-        const firstName = full_name ? full_name.split(' ')[0] : '';
-        const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
-        
-        // Create user profile in the database
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
+        try {
+          // Extract user details from metadata
+          const { full_name, location, farm_size } = metadata;
+          const firstName = full_name ? full_name.split(' ')[0] : '';
+          const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
+          
+          // Create user profile in the database
+          // First check what columns exist in the table
+          const { data: columns, error: columnsError } = await supabase
+            .from('user_profiles')
+            .select()
+            .limit(1);
+            
+          if (columnsError) {
+            console.error('Error checking user_profiles table:', columnsError);
+          }
+          
+          // Build profile object based on available columns
+          const profileData: ExtendedUserProfile = {
             id: data.user.id,
-            email: data.user.email,
-            username: data.user.email?.split('@')[0] || '',
             first_name: firstName,
-            last_name: lastName,
-            phone_number: '',
-            account_type: 'farmer',
-            email_verified: false,
-            status: 'pending'
-          } as UserProfile);
+            last_name: lastName
+          };
+          
+          // Add optional fields if they exist in the schema
+          if ('email' in (columns?.[0] || {})) {
+            profileData.email = data.user.email;
+          }
+          
+          if ('username' in (columns?.[0] || {})) {
+            profileData.username = data.user.email?.split('@')[0] || '';
+          }
+          
+          if ('phone_number' in (columns?.[0] || {})) {
+            profileData.phone_number = '';
+          }
+          
+          if ('account_type' in (columns?.[0] || {})) {
+            profileData.account_type = 'farmer';
+          }
+          
+          if ('email_verified' in (columns?.[0] || {})) {
+            profileData.email_verified = false;
+          }
+          
+          if ('status' in (columns?.[0] || {})) {
+            profileData.status = 'pending';
+          }
+          
+          console.log('Creating user profile with data:', profileData);
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert(profileData);
 
-        if (profileError) {
-          console.error('Error creating user profile:', profileError);
-          toast({
-            title: "Profile creation failed",
-            description: "Account created but profile setup failed. Please contact support.",
-            variant: "destructive"
-          });
+          if (profileError) {
+            console.error('Error creating user profile:', profileError);
+            
+            // Log detailed error for debugging
+            console.log('Profile insertion failed. Details:', { 
+              error: profileError as SupabaseError,
+              errorMessage: (profileError as SupabaseError).message,
+              details: (profileError as SupabaseError).details,
+              hint: (profileError as SupabaseError).hint,
+              code: (profileError as SupabaseError).code
+            });
+            
+            toast({
+              title: "Profile creation failed",
+              description: "Account created but profile setup failed. Please contact support.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error('Exception during profile creation:', error);
         }
       }
 

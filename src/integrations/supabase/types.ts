@@ -375,6 +375,12 @@ export type Database = {
           job_title: string | null
           last_name: string | null
           updated_at: string | null
+          email: string | null
+          username: string | null
+          phone_number: string | null
+          account_type: string | null
+          email_verified: boolean | null
+          status: string | null
         }
         Insert: {
           created_at?: string | null
@@ -383,6 +389,12 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           updated_at?: string | null
+          email?: string | null
+          username?: string | null
+          phone_number?: string | null
+          account_type?: string | null
+          email_verified?: boolean | null
+          status?: string | null
         }
         Update: {
           created_at?: string | null
@@ -391,6 +403,12 @@ export type Database = {
           job_title?: string | null
           last_name?: string | null
           updated_at?: string | null
+          email?: string | null
+          username?: string | null
+          phone_number?: string | null
+          account_type?: string | null
+          email_verified?: boolean | null
+          status?: string | null
         }
         Relationships: []
       }

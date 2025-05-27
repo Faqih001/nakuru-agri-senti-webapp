@@ -1,0 +1,77 @@
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from './types';
+
+// Use environment variables for Supabase configuration
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+// Validate environment variables
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error(
+    "Missing Supabase environment variables. Please check your .env file."
+  );
+}
+        console.debug(`[Supabase] ${method} ${url} - ${response.status} - ${requestDuration}ms`);
+        
+        if (!response.ok) {
+          console.error(`[Supabase Error] ${method} ${url} - ${response.status} ${response.statusText}`);
+          response.clone().text().then(text => {
+            try {
+              const json = JSON.parse(text);
+              console.error('[Supabase Error Details]', json);
+            } catch (e) {
+              console.error('[Supabase Error Raw]', text);
+            }
+          }).catch(e => {
+            console.error('[Supabase Error] Failed to read response body', e);
+          });
+        }
+        
+        return response;
+      });
+    },
+  }
+});
+
+export const supabase = supabaseClient;supabase/supabase-js';
+import type { Database } from './types';
+
+// Use environment variables for Supabase configuration
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const ENABLE_DEBUG = import.meta.env.VITE_ENABLE_DEBUG === 'true';
+
+// Validate environment variables
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error(
+    "Missing Supabase environment variables. Please check your .env file."
+  );
+  throw new Error("Supabase configuration is incomplete. Check your environment variables.");
+}
+
+// Configure debug options
+const supabaseOptions = {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  // Only enable debug in development
+  debug: ENABLE_DEBUG
+};
+
+// Import the supabase client like this:
+// import { supabase } from "@/integrations/supabase/client";
+
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, supabaseOptions);
+
+// Add debugging helper
+export const logSupabaseResponse = (action: string, data: any, error: any) => {
+  if (ENABLE_DEBUG) {
+    console.group(`Supabase ${action}`);
+    if (error) console.error('Error:', error);
+    if (data) console.log('Data:', data);
+    console.groupEnd();
+  }
+  return { data, error };
+};
