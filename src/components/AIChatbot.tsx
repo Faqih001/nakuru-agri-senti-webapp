@@ -21,6 +21,7 @@ export const AIChatbot: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [textareaHeight, setTextareaHeight] = useState<number>(40);
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -81,11 +82,12 @@ export const AIChatbot: React.FC = () => {
     return () => window.removeEventListener('resize', checkDeviceSize);
   }, []);
 
-  // Listen for orientation changes on mobile devices
+  // Enhanced handler for orientation changes and viewport height adjustment
   useEffect(() => {
-    const handleOrientationChange = () => {
-      // Adjust for orientation change by rechecking device size
+    // Calculate and set the optimal chatbot height based on screen size
+    const adjustChatbotHeight = () => {
       const width = window.innerWidth;
+      const height = window.innerHeight;
       setIsMobileView(width < 768);
       
       // Reset textarea height when orientation changes
@@ -93,12 +95,41 @@ export const AIChatbot: React.FC = () => {
         textareaRef.current.style.height = 'auto';
         setTextareaHeight(isMobileView ? 36 : 40);
       }
+      
+      // Adjust chatbot modal height for different screen sizes
+      const chatbotModal = document.querySelector('.chatbot-modal') as HTMLElement;
+      if (chatbotModal) {
+        if (isMobileView) {
+          // For mobile in landscape, use a smaller percentage of the viewport
+          if (width > height) {
+            chatbotModal.style.maxHeight = '70vh';
+          } else {
+            // For mobile in portrait, use a larger percentage
+            chatbotModal.style.maxHeight = height < 700 ? '70vh' : '80vh';
+          }
+        } else {
+          // For desktop/tablet, use fixed height or percentage based on screen size
+          chatbotModal.style.height = height < 800 ? '70vh' : '500px';
+        }
+      }
     };
     
+    // Adjust on orientation change
+    const handleOrientationChange = () => {
+      // Short delay to ensure the viewport dimensions have updated
+      setTimeout(adjustChatbotHeight, 100);
+    };
+    
+    // Initial adjustment
+    adjustChatbotHeight();
+    
+    // Add event listeners
     window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', adjustChatbotHeight);
     
     return () => {
       window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', adjustChatbotHeight);
     };
   }, [isMobileView]);
 
@@ -379,6 +410,13 @@ export const AIChatbot: React.FC = () => {
               <Send size={16} className="md:h-5 md:w-5" />
             </Button>
           </form>
+        </div>
+      )}
+
+      {/* Notification badge for unread messages - only visible when chat is closed */}
+      {!isOpen && hasUnreadMessages && (
+        <div className="absolute bottom-16 right-4 bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-semibold shadow-lg">
+          !
         </div>
       )}
     </div>
