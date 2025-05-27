@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Constants
-const MODEL_NAME = 'gemini-pro';  // This should be the correct model name
+const MODEL_NAME = 'gemini-2.5-flash-preview-05-20';  // Using the preview model
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -185,19 +185,17 @@ export const AIChatbot: React.FC = () => {
   return (
     <div 
       ref={modalRef}
-      className={`fixed bottom-0 right-0 z-50 flex flex-col p-4 ${
-        isOpen ? 'h-auto' : 'h-auto'
-      }`}
+      className="fixed bottom-0 right-0 z-50 p-4 w-full md:w-auto"
       role="dialog"
       aria-label="AI Chat Assistant"
     >
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className={`bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 flex flex-col chatbot-modal absolute
+          className={`bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 flex flex-col
             ${isMobileView ? 
-              'bottom-20 right-0 left-0 mx-4 h-[80vh] max-h-[600px]' : 
-              'bottom-20 right-4 w-[400px] md:w-[450px] lg:w-[500px] h-[600px]'
+              'mx-auto w-[calc(100%-2rem)] h-[80vh] max-h-[600px] mb-20' : 
+              'w-[400px] md:w-[450px] lg:w-[500px] h-[600px] mb-20'
             }`}
         >
           {/* Header */}
@@ -225,7 +223,7 @@ export const AIChatbot: React.FC = () => {
           </div>
 
           {/* Messages Area */}
-          <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-4 scroll-area bg-gradient-to-b from-white/50 to-white/30">
+          <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-4 scroll-area bg-gradient-to-b from-white/50 to-white/30 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
             {messages.map((message, index) => (
               <div
                 key={`${message.timestamp}-${index}`}
@@ -320,7 +318,7 @@ export const AIChatbot: React.FC = () => {
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-4 right-4 p-4 bg-green-500 text-white rounded-full shadow-xl hover:bg-green-600 transition-all transform hover:scale-105 ${
+        className={`fixed bottom-4 right-4 w-14 h-14 bg-green-500 text-white rounded-full shadow-xl hover:bg-green-600 transition-all transform hover:scale-105 ${
           hasUnreadMessages ? 'animate-bounce' : ''
         } flex items-center justify-center`}
         aria-label="Open chat"
