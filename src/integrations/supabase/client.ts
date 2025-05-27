@@ -12,7 +12,28 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   );
 }
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Initialize Supabase client with debugging options
+const supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Add debug logging for auth events
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  console.log('[Supabase Auth Event]', event, session?.user?.id);
+});
+
+// Helper function to log Supabase errors in detail
+export const logSupabaseError = (error: any, context: string) => {
+  console.error(`[Supabase Error] ${context}:`, {
+    message: error?.message,
+    details: error?.details,
+    hint: error?.hint,
+    code: error?.code
+  });
+};
+
+export const supabase = supabaseClient;
