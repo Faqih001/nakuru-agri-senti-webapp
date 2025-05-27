@@ -1,3 +1,4 @@
+// NOTE: Schema validation disabled due to connectivity issues
 {
   "files": [],
   "references": [
@@ -9,11 +10,13 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "allowJs": true,
     "noUnusedLocals": false,
-    "strictNullChecks": false
+    "noUnusedParameters": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }
