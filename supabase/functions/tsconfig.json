@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "strict": true,
+    "target": "esnext",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "std/*": ["https://deno.land/std@0.204.0/*"],
+      "@supabase/supabase-js": ["https://esm.sh/@supabase/supabase-js@2.39.3"]
+    }
+  },
+  "include": ["**/*.ts"]
+}
