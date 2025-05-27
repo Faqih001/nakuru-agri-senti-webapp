@@ -295,7 +295,7 @@ export const AIChatbot: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="absolute right-2 bottom-1.5 p-2 bg-green-500 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-green-500 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
                   aria-label="Send message"
                 >
                   {isLoading ? (
