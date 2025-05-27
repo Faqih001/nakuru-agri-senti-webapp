@@ -193,6 +193,21 @@ export const AIChatbot: React.FC = () => {
     };
   }, [isOpen, isMobileView]);
 
+  // Track when new messages arrive when chat is minimized
+  useEffect(() => {
+    // Only set unread flag if there are messages, chat is closed, and the latest message is from model
+    if (
+      messages.length > 0 && 
+      !isOpen && 
+      messages[messages.length - 1].role === 'model'
+    ) {
+      setHasUnreadMessages(true);
+    } else if (isOpen) {
+      // Clear unread flag when chat is opened
+      setHasUnreadMessages(false);
+    }
+  }, [messages, isOpen]);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
