@@ -1,19 +1,9 @@
-
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import React, { useEffect, useState, useContext } from 'react';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signUp: (email: string, password: string, metadata?: any) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
-  signOut: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContextType, UserMetadata, SignUpResponse, SignInResponse, UserProfile } from './types';
+import { AuthContext, AuthEvents } from './auth';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,12 +21,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
         
         // Handle different auth events
-        if (event === 'SIGNED_UP') {
+        if (event === AuthEvents.SIGNED_UP) {
           toast({
             title: "Account created successfully!",
             description: "Welcome to AgriSenti. You can now start using our smart farming tools.",
           });
-        } else if (event === 'SIGNED_IN') {
+        } else if (event === AuthEvents.SIGNED_IN) {
           toast({
             title: "Welcome back!",
             description: "Successfully signed in to AgriSenti.",
@@ -55,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, [toast]);
 
-  const signUp = async (email: string, password: string, metadata = {}) => {
+  const signUp = async (email: string, password: string, metadata: UserMetadata = {}): Promise<SignUpResponse> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -72,24 +62,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Create a user profile record if the user was created successfully
       if (data.user) {
         // Extract user details from metadata
-        const { full_name, location, farm_size } = metadata as any;
+        const { full_name, location, farm_size } = metadata;
         const firstName = full_name ? full_name.split(' ')[0] : '';
         const lastName = full_name ? full_name.split(' ').slice(1).join(' ') : '';
         
         // Create user profile in the database
         const { error: profileError } = await supabase
-          .from('users')
+          .from('user_profiles')
           .insert({
             id: data.user.id,
             email: data.user.email,
-            username: data.user.email?.split('@')[0],
-            password_hash: '', // This is managed by Supabase Auth
+            username: data.user.email?.split('@')[0] || '',
             first_name: firstName,
             last_name: lastName,
             phone_number: '',
             account_type: 'farmer',
             email_verified: false,
-          });
+            status: 'pending'
+          } as UserProfile);
 
         if (profileError) {
           console.error('Error creating user profile:', profileError);
@@ -110,20 +100,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign up error:', error);
+      const authError = error as AuthError;
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: authError.message,
         variant: "destructive"
       });
-      return { data: null, error };
+      return { data: null, error: authError };
     } finally {
       setLoading(false);
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<SignInResponse> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -134,14 +125,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign in error:', error);
-      let errorMessage = error.message;
+      const authError = error as AuthError;
+      let errorMessage = authError.message;
       
-      // Provide more helpful error messages
-      if (error.message === 'Invalid login credentials') {
+      if (errorMessage === 'Invalid login credentials') {
         errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-      } else if (error.message.includes('Email not confirmed')) {
+      } else if (errorMessage.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link before signing in.';
       }
       
@@ -150,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: errorMessage,
         variant: "destructive"
       });
-      return { data: null, error };
+      return { data: null, error: authError };
     } finally {
       setLoading(false);
     }
@@ -165,33 +156,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Signed out",
         description: "You have been successfully signed out.",
       });
-    } catch (error: any) {
+    } catch (error) {
+      const authError = error as AuthError;
       toast({
         title: "Sign out failed",
-        description: error.message,
+        description: authError.message,
         variant: "destructive"
       });
     }
   };
 
+  const contextValue: AuthContextType = {
+    user,
+    session,
+    loading,
+    signUp,
+    signIn,
+    signOut
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      signUp,
-      signIn,
-      signOut
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

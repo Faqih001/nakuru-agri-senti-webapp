@@ -1,6 +1,16 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
+import { serve, createClient } from '../deps.ts';
+import { corsHeaders } from '../_shared/cors.ts';
+
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+};
+
+interface SecurityEventDetails {
+  email: string;
+  [key: string]: unknown;
+}
 
 serve(async (req) => {
   // Handle CORS
@@ -55,10 +65,10 @@ serve(async (req) => {
 
     // Update user's email verification status
     const { error: updateError } = await supabaseAdmin
-      .from('users')
+      .from('user_profiles')
       .update({ 
         email_verified: true,
-        status: 'active'
+        status: 'active' as const
       })
       .eq('id', user.id);
 
@@ -69,10 +79,10 @@ serve(async (req) => {
     // Log the security event
     await supabaseAdmin.rpc('log_security_event', {
       p_user_id: user.id,
-      p_event_type: 'email_verified',
+      p_event_type: 'email_verified' as const,
       p_ip_address: req.headers.get('x-forwarded-for') || 'unknown',
       p_user_agent: req.headers.get('user-agent') || 'unknown',
-      p_details: { email: user.email }
+      p_details: { email: user.email } as SecurityEventDetails
     });
 
     return new Response(
@@ -89,13 +99,16 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Verification error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    const errorStatus = (error as { status?: number }).status || 400;
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.status || 400,
+        status: errorStatus,
       }
     );
   }
