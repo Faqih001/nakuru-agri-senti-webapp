@@ -287,7 +287,7 @@ export const DashboardLayout = () => {
                     className="flex items-center space-x-2"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar_url} alt={user?.email} />
+                      <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
                       <AvatarFallback>{userInitials}</AvatarFallback>
                     </Avatar>
                     <ChevronDown className="w-4 h-4 text-gray-500" />
