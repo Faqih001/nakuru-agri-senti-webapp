@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI('AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro');
+// Initialize Gemini AI with API key from environment variables
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 interface Message {
   role: 'user' | 'model';

@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Outlet } from "react-router-dom";
 import ConfigurationAlert from "@/components/ConfigurationAlert";
+import AIChatbot from "@/components/AIChatbot";
 
 export const Layout = () => {
   return (
@@ -13,6 +14,7 @@ export const Layout = () => {
       <Footer />
       {/* Only show the configuration alert in development mode */}
       {import.meta.env.DEV && <ConfigurationAlert />}
+      <AIChatbot />
     </div>
   );
 };
