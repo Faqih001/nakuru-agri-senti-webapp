@@ -186,7 +186,7 @@ export const AIChatbot: React.FC = () => {
     <div 
       ref={modalRef}
       className={`fixed bottom-0 right-0 z-50 flex flex-col p-4 ${
-        isOpen ? 'h-full md:h-auto' : 'h-auto'
+        isOpen ? 'h-auto' : 'h-auto'
       }`}
       role="dialog"
       aria-label="AI Chat Assistant"
@@ -194,47 +194,77 @@ export const AIChatbot: React.FC = () => {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className={`bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col chatbot-modal
+          className={`bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 flex flex-col chatbot-modal absolute
             ${isMobileView ? 
-              'bottom-16 right-0 left-0 mx-2 max-h-[80vh]' : 
-              'bottom-16 right-0 w-[350px] md:w-[400px] lg:w-[450px] h-[500px] max-h-[80vh]'
+              'bottom-20 right-0 left-0 mx-4 h-[80vh] max-h-[600px]' : 
+              'bottom-20 right-4 w-[400px] md:w-[450px] lg:w-[500px] h-[600px]'
             }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold">AgriSenti Assistant</h2>
+          <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white/50 backdrop-blur-sm rounded-t-2xl">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.6 13.4A7 7 0 1 1 15 8a7 7 0 0 1-1.4 5.4m0 0l3.71 3.71a1 1 0 1 1-1.42 1.42L12.2 15a7 7 0 0 1-4.2 1c-1.56 0-3-.41-4.2-1l-3.71 3.71a1 1 0 0 1-1.42-1.42L2.4 13.4A7 7 0 0 1 1 8c0-1.56.41-3 1.4-4.2M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">AgriSenti Assistant</h2>
+                <p className="text-xs text-gray-500">AI-powered farming insights</p>
+              </div>
+            </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 hover:bg-gray-100/80 rounded-full transition-colors"
               aria-label="Close chat"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           {/* Messages Area */}
-          <div ref={scrollAreaRef} className="flex-1 overflow-y-auto p-4 space-y-4 scroll-area">
+          <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-4 scroll-area bg-gradient-to-b from-white/50 to-white/30">
             {messages.map((message, index) => (
               <div
                 key={`${message.timestamp}-${index}`}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex items-start space-x-2 ${message.role === 'user' ? 'justify-end space-x-reverse' : 'justify-start'}`}
               >
+                {message.role !== 'user' && (
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13.6 13.4A7 7 0 1 1 15 8a7 7 0 0 1-1.4 5.4m0 0l3.71 3.71a1 1 0 1 1-1.42 1.42L12.2 15a7 7 0 0 1-4.2 1c-1.56 0-3-.41-4.2-1l-3.71 3.71a1 1 0 0 1-1.42-1.42L2.4 13.4A7 7 0 0 1 1 8c0-1.56.41-3 1.4-4.2M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                    </svg>
+                  </div>
+                )}
                 <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
+                  className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${
                     message.role === 'user'
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-green-500 text-white ml-4'
                       : message.role === 'error'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-gray-100'
+                      ? 'bg-red-50 text-red-700 border border-red-100'
+                      : 'bg-white border border-gray-100'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                  <span className="text-xs opacity-75 mt-1 block">
+                  <p className="whitespace-pre-wrap text-[15px]">{message.content}</p>
+                  <span className={`text-[11px] mt-1 block ${
+                    message.role === 'user' 
+                      ? 'text-white/75'
+                      : message.role === 'error'
+                      ? 'text-red-500'
+                      : 'text-gray-400'
+                  }`}>
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
+                {message.role === 'user' && (
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && (
@@ -247,32 +277,41 @@ export const AIChatbot: React.FC = () => {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200">
+          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100 bg-white/50 backdrop-blur-sm rounded-b-2xl">
             <div className="flex items-end space-x-2">
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 resize-none rounded-lg border border-gray-300 p-2 focus:outline-none focus:border-blue-500"
-                rows={1}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || isLoading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
-                aria-label="Send message"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                </svg>
-              </button>
+              <div className="flex-1 relative">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask about farming, weather, or crops..."
+                  className="w-full resize-none rounded-2xl border border-gray-200 bg-white/80 p-3 pr-12 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 text-[15px] placeholder:text-gray-400 min-h-[44px]"
+                  rows={1}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim() || isLoading}
+                  className="absolute right-2 bottom-1.5 p-2 bg-green-500 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+                  aria-label="Send message"
+                >
+                  {isLoading ? (
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -281,13 +320,16 @@ export const AIChatbot: React.FC = () => {
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-4 right-4 p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors ${
+        className={`fixed bottom-4 right-4 p-4 bg-green-500 text-white rounded-full shadow-xl hover:bg-green-600 transition-all transform hover:scale-105 ${
           hasUnreadMessages ? 'animate-bounce' : ''
-        }`}
+        } flex items-center justify-center`}
         aria-label="Open chat"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        {hasUnreadMessages ? (
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+        ) : null}
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M13.6 13.4A7 7 0 1 1 15 8a7 7 0 0 1-1.4 5.4m0 0l3.71 3.71a1 1 0 1 1-1.42 1.42L12.2 15a7 7 0 0 1-4.2 1c-1.56 0-3-.41-4.2-1l-3.71 3.71a1 1 0 0 1-1.42-1.42L2.4 13.4A7 7 0 0 1 1 8c0-1.56.41-3 1.4-4.2M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
         </svg>
       </button>
     </div>
