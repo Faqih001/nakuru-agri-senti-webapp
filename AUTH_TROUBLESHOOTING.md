@@ -76,7 +76,7 @@ This project includes several debugging tools:
 
 Make sure your `.env` file contains these correctly configured variables:
 
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_URL=<https://your-project-ref.supabase.co>
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
