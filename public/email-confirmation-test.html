@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Confirmation Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .success { background-color: #d4edda; }
+    .error { background-color: #f8d7da; }
+    .info { background-color: #e2e3e5; }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+    }
+    #loading {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Supabase Email Confirmation Test</h1>
+  
+  <div class="container">
+    <h2>Configuration</h2>
+    
+    <div class="form-group">
+      <label for="supabaseUrl">Supabase URL:</label>
+      <input type="text" id="supabaseUrl" placeholder="e.g. https://your-project-ref.supabase.co">
+    </div>
+    
+    <div class="form-group">
+      <label for="supabaseAnonKey">Supabase Anon Key:</label>
+      <input type="text" id="supabaseAnonKey" placeholder="Public anon key">
+    </div>
+    
+    <div class="form-group">
+      <label for="supabaseServiceKey">Supabase Service Role Key:</label>
+      <input type="text" id="supabaseServiceKey" placeholder="Service role key (keep this secret!)">
+    </div>
+    
+    <button onclick="loadFromEnv()">Load from .env (Dev Only)</button>
+    <button onclick="testConnection()">Test Connection</button>
+    <button onclick="parseJwt()">Inspect Service Role Key</button>
+    
+    <div id="configResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h2>Create Test User</h2>
+    
+    <div class="form-group">
+      <label for="testEmail">Test Email:</label>
+      <input type="email" id="testEmail" placeholder="test@example.com">
+    </div>
+    
+    <div class="form-group">
+      <label for="testPassword">Test Password:</label>
+      <input type="password" id="testPassword" value="password123">
+    </div>
+    
+    <button onclick="createTestUser()">Create User</button>
+    <div id="createResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h2>Auto-Confirm Email</h2>
+    
+    <div class="form-group">
+      <label for="userId">User ID:</label>
+      <input type="text" id="userId" placeholder="User ID from create step">
+    </div>
+    
+    <button onclick="confirmEmail()">Confirm Email (Service Role)</button>
+    <div id="confirmResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h2>Test User Login</h2>
+    
+    <div class="form-group">
+      <label for="loginEmail">Email:</label>
+      <input type="email" id="loginEmail" placeholder="test@example.com">
+    </div>
+    
+    <div class="form-group">
+      <label for="loginPassword">Password:</label>
+      <input type="password" id="loginPassword" value="password123">
+    </div>
+    
+    <button onclick="loginTestUser()">Login</button>
+    <div id="loginResult" class="result"></div>
+  </div>
+  
+  <div id="loading">Processing...</div>
+  
+  <script>
+    let supabase = null;
+    let serviceRoleClient = null;
+    
+    // Try to load from environment variables if in development
+    async function loadFromEnv() {
+      try {
+        const dotenv = await fetchEnvFile();
+        const configResult = document.getElementById('configResult');
+        
+        if (dotenv.error) {
+          configResult.textContent = `Error loading .env file: ${dotenv.error}`;
+          configResult.className = 'result error';
+          return;
+        }
+        
+        // Parse the .env content
+        const env = {};
+        dotenv.content.split('\n').forEach(line => {
+          if (line.trim() && !line.startsWith('#') && !line.startsWith('//')) {
+            const parts = line.split('=');
+            if (parts.length >= 2) {
+              const key = parts[0].trim();
+              const value = parts.slice(1).join('=').trim();
+              env[key] = value;
+            }
+          }
+        });
+        
+        // Update the form inputs
+        document.getElementById('supabaseUrl').value = env.VITE_SUPABASE_URL || '';
+        document.getElementById('supabaseAnonKey').value = env.VITE_SUPABASE_ANON_KEY || '';
+        document.getElementById('supabaseServiceKey').value = env.VITE_SUPABASE_SERVICE_ROLE_KEY || '';
+        
+        configResult.textContent = 'Configuration loaded from .env file';
+        configResult.className = 'result success';
+        
+        // Initialize clients
+        initClients();
+      } catch (error) {
+        const configResult = document.getElementById('configResult');
+        configResult.textContent = `Error: ${error.message}`;
+        configResult.className = 'result error';
+      }
+    }
+    
+    async function fetchEnvFile() {
+      try {
+        const response = await fetch('/.env', { method: 'GET' });
+        if (response.ok) {
+          const content = await response.text();
+          return { content };
+        } else {
+          return { error: `HTTP error: ${response.status}` };
+        }
+      } catch (error) {
+        return { error: error.message };
+      }
+    }
+    
+    function initClients() {
+      const url = document.getElementById('supabaseUrl').value;
+      const anonKey = document.getElementById('supabaseAnonKey').value;
+      const serviceKey = document.getElementById('supabaseServiceKey').value;
+      
+      if (!url || !anonKey) {
+        const configResult = document.getElementById('configResult');
+        configResult.textContent = 'Please provide both Supabase URL and Anon Key';
+        configResult.className = 'result error';
+        return;
+      }
+      
+      // Initialize regular client
+      try {
+        supabase = supabase.createClient(url, anonKey);
+      } catch (error) {
+        console.error('Error initializing supabase client:', error);
+      }
+      
+      // Initialize service role client if key is provided
+      if (serviceKey) {
+        try {
+          serviceRoleClient = supabase.createClient(url, serviceKey, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          });
+        } catch (error) {
+          console.error('Error initializing service role client:', error);
+        }
+      }
+    }
+    
+    // Test connection to Supabase
+    async function testConnection() {
+      const configResult = document.getElementById('configResult');
+      configResult.textContent = 'Testing connection...';
+      configResult.className = 'result info';
+      
+      // Initialize clients first
+      initClients();
+      
+      if (!supabase) {
+        configResult.textContent = 'Supabase client not initialized. Check your URL and Anon Key.';
+        configResult.className = 'result error';
+        return;
+      }
+      
+      try {
+        // Test anon client
+        const { data, error } = await supabase.from('user_profiles').select('count', { count: 'exact', head: true });
+        
+        if (error) {
+          configResult.textContent = `Connection error (anon client): ${JSON.stringify(error)}`;
+          configResult.className = 'result error';
+          return;
+        }
+        
+        // Test service role client if available
+        let serviceRoleResult = 'Service role client not initialized (no key provided)';
+        if (serviceRoleClient) {
+          const { data: srData, error: srError } = await serviceRoleClient.from('user_profiles').select('count', { count: 'exact', head: true });
+          
+          if (srError) {
+            serviceRoleResult = `Service role client error: ${JSON.stringify(srError)}`;
+          } else {
+            serviceRoleResult = 'Service role client connection successful';
+          }
+        }
+        
+        configResult.textContent = `Anon client connection successful\n\n${serviceRoleResult}`;
+        configResult.className = 'result success';
+      } catch (error) {
+        configResult.textContent = `Exception during connection test: ${error.message}`;
+        configResult.className = 'result error';
+      }
+    }
+    
+    // Inspect JWT token
+    function parseJwt() {
+      const serviceKey = document.getElementById('supabaseServiceKey').value;
+      const configResult = document.getElementById('configResult');
+      
+      if (!serviceKey) {
+        configResult.textContent = 'Please enter a service role key to inspect';
+        configResult.className = 'result error';
+        return;
+      }
+      
+      try {
+        const parts = serviceKey.split('.');
+        if (parts.length !== 3) {
+          configResult.textContent = 'Invalid JWT format. Should have 3 parts separated by dots.';
+          configResult.className = 'result error';
+          return;
+        }
+        
+        const payload = JSON.parse(atob(parts[1]));
+        const formatted = JSON.stringify(payload, null, 2);
+        
+        let analysis = '';
+        
+        // Check for common issues
+        if (payload.rose && !payload.role) {
+          analysis = '\n\n⚠️ ERROR: Found "rose" claim instead of "role". This is a common typo!';
+        } else if (!payload.role) {
+          analysis = '\n\n⚠️ ERROR: Missing "role" claim in payload!';
+        } else if (payload.role !== 'service_role') {
+          analysis = `\n\n⚠️ ERROR: The "role" claim is not set to "service_role" (found "${payload.role}")`;
+        } else {
+          analysis = '\n\n✓ JWT format looks valid with correct "role" claim';
+        }
+        
+        configResult.textContent = formatted + analysis;
+        configResult.className = 'result info';
+      } catch (error) {
+        configResult.textContent = `Error parsing JWT: ${error.message}`;
+        configResult.className = 'result error';
+      }
+    }
+    
+    // Create a test user
+    async function createTestUser() {
+      const createResult = document.getElementById('createResult');
+      createResult.textContent = 'Creating user...';
+      createResult.className = 'result info';
+      
+      document.getElementById('loading').style.display = 'block';
+      
+      // Initialize clients if not already done
+      initClients();
+      
+      if (!supabase) {
+        createResult.textContent = 'Supabase client not initialized. Check your URL and Anon Key.';
+        createResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      const email = document.getElementById('testEmail').value;
+      const password = document.getElementById('testPassword').value;
+      
+      if (!email || !password) {
+        createResult.textContent = 'Please provide both email and password';
+        createResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      try {
+        // First try to sign up with emailConfirm: false
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+            emailConfirm: false
+          }
+        });
+        
+        if (error) {
+          createResult.textContent = `Error creating user: ${JSON.stringify(error)}`;
+          createResult.className = 'result error';
+        } else {
+          createResult.textContent = `User created successfully! User ID: ${data.user.id}\n\n${JSON.stringify(data.user, null, 2)}`;
+          createResult.className = 'result success';
+          
+          // Auto-fill the user ID for the next step
+          document.getElementById('userId').value = data.user.id;
+        }
+      } catch (error) {
+        createResult.textContent = `Exception during user creation: ${error.message}`;
+        createResult.className = 'result error';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+    
+    // Confirm a user's email using the service role client
+    async function confirmEmail() {
+      const confirmResult = document.getElementById('confirmResult');
+      confirmResult.textContent = 'Confirming email...';
+      confirmResult.className = 'result info';
+      
+      document.getElementById('loading').style.display = 'block';
+      
+      if (!serviceRoleClient) {
+        confirmResult.textContent = 'Service role client not initialized. Please provide a valid service role key.';
+        confirmResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      const userId = document.getElementById('userId').value;
+      
+      if (!userId) {
+        confirmResult.textContent = 'Please provide a user ID';
+        confirmResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      try {
+        // Try the first method: direct update of email_confirmed_at
+        const { data, error } = await serviceRoleClient.auth.admin.updateUserById(
+          userId,
+          { email_confirmed_at: new Date().toISOString() }
+        );
+        
+        if (error) {
+          confirmResult.textContent = `Method 1 failed: ${JSON.stringify(error)}\n\nTrying Method 2...`;
+          
+          // Try the second method: update user metadata
+          const { data: data2, error: error2 } = await serviceRoleClient.auth.admin.updateUserById(
+            userId,
+            { user_metadata: { email_confirmed: true } }
+          );
+          
+          if (error2) {
+            confirmResult.textContent += `\n\nMethod 2 failed: ${JSON.stringify(error2)}\n\nTrying Method 3...`;
+            
+            // Try direct API call
+            try {
+              const url = document.getElementById('supabaseUrl').value;
+              const serviceKey = document.getElementById('supabaseServiceKey').value;
+              
+              const response = await fetch(`${url}/auth/v1/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                  'Authorization': `Bearer ${serviceKey}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  email_confirmed_at: new Date().toISOString()
+                })
+              });
+              
+              if (!response.ok) {
+                confirmResult.textContent += `\n\nMethod 3 failed: ${await response.text()}`;
+                confirmResult.className = 'result error';
+              } else {
+                const responseData = await response.json();
+                confirmResult.textContent += `\n\nMethod 3 succeeded: ${JSON.stringify(responseData)}`;
+                confirmResult.className = 'result success';
+              }
+            } catch (apiError) {
+              confirmResult.textContent += `\n\nMethod 3 exception: ${apiError.message}`;
+              confirmResult.className = 'result error';
+            }
+          } else {
+            confirmResult.textContent += `\n\nMethod 2 succeeded: ${JSON.stringify(data2)}`;
+            confirmResult.className = 'result success';
+          }
+        } else {
+          confirmResult.textContent = `Email confirmed successfully with Method 1: ${JSON.stringify(data)}`;
+          confirmResult.className = 'result success';
+        }
+      } catch (error) {
+        confirmResult.textContent = `Exception during email confirmation: ${error.message}`;
+        confirmResult.className = 'result error';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+    
+    // Test login with the created user
+    async function loginTestUser() {
+      const loginResult = document.getElementById('loginResult');
+      loginResult.textContent = 'Logging in...';
+      loginResult.className = 'result info';
+      
+      document.getElementById('loading').style.display = 'block';
+      
+      // Initialize clients if not already done
+      initClients();
+      
+      if (!supabase) {
+        loginResult.textContent = 'Supabase client not initialized. Check your URL and Anon Key.';
+        loginResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      if (!email || !password) {
+        loginResult.textContent = 'Please provide both email and password';
+        loginResult.className = 'result error';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) {
+          loginResult.textContent = `Error logging in: ${JSON.stringify(error)}`;
+          loginResult.className = 'result error';
+          
+          // Check if email confirmation is the issue
+          if (error.message.includes('Email not confirmed')) {
+            loginResult.textContent += '\n\nIt appears the email is not confirmed. Use the "Confirm Email" section above to confirm manually.';
+          }
+        } else {
+          loginResult.textContent = `Login successful! User is ${data.user.email}\n\n${JSON.stringify(data.user, null, 2)}`;
+          loginResult.className = 'result success';
+        }
+      } catch (error) {
+        loginResult.textContent = `Exception during login: ${error.message}`;
+        loginResult.className = 'result error';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
