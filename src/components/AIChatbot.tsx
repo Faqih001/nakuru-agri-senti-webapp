@@ -221,6 +221,18 @@ export const AIChatbot: React.FC = () => {
     setInputValue('');
     setIsLoading(true);
     
+    // Add a loading timeout indicator for slow networks
+    const loadingTimeout = setTimeout(() => {
+      // If still loading after 5 seconds, add a temporary message
+      if (isLoading) {
+        const tempMessage: Message = { 
+          role: 'model', 
+          content: 'I\'m thinking... This might take a moment on slower connections.' 
+        };
+        setMessages(prev => [...prev, tempMessage]);
+      }
+    }, 5000);
+    
     try {
       // Get the generative model
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
@@ -266,6 +278,8 @@ export const AIChatbot: React.FC = () => {
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
+      // Clear the loading timeout
+      clearTimeout(loadingTimeout);
       setIsLoading(false);
     }
   };
@@ -326,13 +340,24 @@ export const AIChatbot: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8 z-50">
-      {/* Chatbot toggle button - enhanced for different device sizes */}
+      {/* Chatbot toggle button with notification badge for unread messages */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-full shadow-lg bg-green-600 hover:bg-green-700 transition-all duration-200"
-        aria-label={isOpen ? "Close chat assistant" : "Open chat assistant"}
+        className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-full shadow-lg bg-green-600 hover:bg-green-700 transition-all duration-200 relative"
+        aria-label={isOpen ? "Close chat assistant" : `Open chat assistant${hasUnreadMessages ? ' (new messages)' : ''}`}
       >
-        {isOpen ? <X size={20} className="md:h-6 md:w-6 lg:h-7 lg:w-7" /> : <MessageSquare size={20} className="md:h-6 md:w-6 lg:h-7 lg:w-7" />}
+        {isOpen ? (
+          <X size={20} className="md:h-6 md:w-6 lg:h-7 lg:w-7" />
+        ) : (
+          <>
+            <MessageSquare size={20} className="md:h-6 md:w-6 lg:h-7 lg:w-7" />
+            {/* Notification badge */}
+            {hasUnreadMessages && (
+              <span className="absolute top-0 right-0 h-3 w-3 md:h-4 md:w-4 bg-red-500 rounded-full animate-pulse" 
+                    aria-hidden="true" />
+            )}
+          </>
+        )}
       </Button>
 
       {/* Chat modal - enhanced responsive design */}
