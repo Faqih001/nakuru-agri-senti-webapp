@@ -1,6 +1,6 @@
-export { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-export { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-export type { PostgrestError } from "https://esm.sh/@supabase/supabase-js@2";
+export { serve } from "std/http/server.ts";
+export { createClient } from "@supabase/supabase-js";
+export type { PostgrestError } from "@supabase/supabase-js";
 
 // Re-export types that might be needed
-export type { Session, User, AuthError } from "https://esm.sh/@supabase/supabase-js@2";
+export type { Session, User, AuthError } from "@supabase/supabase-js";
