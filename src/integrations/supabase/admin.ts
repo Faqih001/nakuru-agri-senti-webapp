@@ -14,8 +14,14 @@ let serviceRoleClient: ReturnType<typeof createClient<Database>> | null = null;
 if (SUPABASE_SERVICE_KEY) {
   serviceRoleClient = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: {
-      autoRefreshToken: true,
-      persistSession: false
+      autoRefreshToken: false,
+      persistSession: false,
+      // Use a different storage key to avoid conflicts with the main client
+      storageKey: 'supabase_service_role_auth'
+    },
+    global: {
+      // Add a custom header to identify service role requests (optional)
+      headers: { 'x-service-role': 'true' }
     }
   });
 } else {

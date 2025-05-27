@@ -196,7 +196,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Check if service role client is available
       if (!serviceRoleClient) {
-        console.error('Service role client is not available. Check if VITE_SUPABASE_SERVICE_ROLE_KEY is set in your environment variables.');
+        console.error('Service role client is not available. Check if VITE_SUPABASE_SERVICE_ROLE_KEY is set in your environment variables and restart the application.');
+        toast({
+          title: "Profile creation error",
+          description: "Unable to create your profile due to missing service credentials. Please contact support.",
+          variant: "destructive"
+        });
         throw new Error('Service role client is not available for profile creation');
       }
       
