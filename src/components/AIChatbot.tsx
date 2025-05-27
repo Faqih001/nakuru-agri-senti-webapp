@@ -153,10 +153,13 @@ export const AIChatbot: React.FC = () => {
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </Button>
 
-      {/* Chat modal */}
+      {/* Chat modal - enhanced responsive design */}
       {isOpen && (
         <div 
-          className={`absolute ${isMobileView ? 'bottom-16 right-0 w-screen max-w-full' : 'bottom-16 right-0 w-[350px] h-[500px]'} bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col`}
+          className={`absolute bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col
+            ${isMobileView ? 
+              'bottom-16 right-0 left-0 mx-2 max-h-[80vh]' : 
+              'bottom-16 right-0 w-[350px] md:w-[400px] lg:w-[450px] h-[500px] max-h-[80vh]'}`}
         >
           {/* Header */}
           <div className="p-4 border-b border-gray-200 bg-green-600 text-white rounded-t-lg flex justify-between items-center">
