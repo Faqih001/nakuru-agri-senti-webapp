@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Connection Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .success { background-color: #d4edda; }
+    .error { background-color: #f8d7da; }
+    .info { background-color: #e2e3e5; }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    h3 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h1>Supabase Connection Test</h1>
+  <p>This page helps you diagnose connection issues with your Supabase project.</p>
+  
+  <div class="container">
+    <h3>1. Configure Supabase Details</h3>
+    <div>
+      <label for="supabaseUrl">Supabase URL:</label>
+      <input type="text" id="supabaseUrl" placeholder="https://your-project-id.supabase.co">
+    </div>
+    <div>
+      <label for="supabaseKey">Supabase Anon Key:</label>
+      <input type="text" id="supabaseKey" placeholder="your-anon-key">
+    </div>
+    <button onclick="saveConfig()">Save Configuration</button>
+    <div id="configResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h3>2. Basic Connectivity Test</h3>
+    <p>Tests a simple fetch to your Supabase URL</p>
+    <button onclick="testConnection()">Test Connection</button>
+    <div id="connectionResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h3>3. Auth API Test</h3>
+    <p>Tests access to Supabase Auth API endpoints</p>
+    <button onclick="testAuthApi()">Test Auth API</button>
+    <div id="authResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h3>4. REST API Test</h3>
+    <p>Tests access to Supabase REST API endpoints</p>
+    <button onclick="testRestApi()">Test REST API</button>
+    <div id="restResult" class="result"></div>
+  </div>
+  
+  <div class="container">
+    <h3>5. Network Diagnosis</h3>
+    <button onclick="runNetworkDiagnosis()">Run Network Diagnosis</button>
+    <div id="diagnosticsResult" class="result"></div>
+  </div>
+
+  <script>
+    // Load saved values
+    window.onload = function() {
+      const url = localStorage.getItem('supabaseUrl');
+      const key = localStorage.getItem('supabaseKey');
+      if (url) document.getElementById('supabaseUrl').value = url;
+      if (key) document.getElementById('supabaseKey').value = key;
+    };
+    
+    function saveConfig() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const key = document.getElementById('supabaseKey').value.trim();
+      const resultDiv = document.getElementById('configResult');
+      
+      if (!url || !key) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 'Please provide both Supabase URL and Anon Key';
+        return;
+      }
+      
+      localStorage.setItem('supabaseUrl', url);
+      localStorage.setItem('supabaseKey', key);
+      
+      resultDiv.className = 'result success';
+      resultDiv.textContent = 'Configuration saved successfully!';
+    }
+    
+    async function testConnection() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const resultDiv = document.getElementById('connectionResult');
+      
+      if (!url) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 'Please enter a Supabase URL first';
+        return;
+      }
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = 'Testing connection...';
+      
+      try {
+        const startTime = performance.now();
+        const response = await fetch(url, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-cache'
+        });
+        const endTime = performance.now();
+        
+        resultDiv.className = 'result success';
+        resultDiv.textContent = `Connection successful! (${Math.round(endTime - startTime)}ms)
+Response type: ${response.type}`;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `Connection failed: ${error.message}`;
+      }
+    }
+    
+    async function testAuthApi() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const key = document.getElementById('supabaseKey').value.trim();
+      const resultDiv = document.getElementById('authResult');
+      
+      if (!url || !key) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 'Please enter both Supabase URL and Anon Key first';
+        return;
+      }
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = 'Testing Auth API...';
+      
+      try {
+        const startTime = performance.now();
+        const response = await fetch(`${url}/auth/v1/`, {
+          method: 'GET',
+          headers: {
+            'apikey': key,
+            'Content-Type': 'application/json'
+          }
+        });
+        const endTime = performance.now();
+        
+        let resultText = `Auth API status: ${response.status} (${Math.round(endTime - startTime)}ms)\n`;
+        resultText += `Status text: ${response.statusText}\n\n`;
+        
+        try {
+          const data = await response.json();
+          resultText += `Response: ${JSON.stringify(data, null, 2)}`;
+        } catch (e) {
+          resultText += 'Could not parse JSON response';
+        }
+        
+        resultDiv.className = response.ok ? 'result success' : 'result error';
+        resultDiv.textContent = resultText;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `Auth API test failed: ${error.message}`;
+      }
+    }
+    
+    async function testRestApi() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const key = document.getElementById('supabaseKey').value.trim();
+      const resultDiv = document.getElementById('restResult');
+      
+      if (!url || !key) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 'Please enter both Supabase URL and Anon Key first';
+        return;
+      }
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = 'Testing REST API...';
+      
+      try {
+        const startTime = performance.now();
+        const response = await fetch(`${url}/rest/v1/`, {
+          method: 'GET',
+          headers: {
+            'apikey': key,
+            'Content-Type': 'application/json'
+          }
+        });
+        const endTime = performance.now();
+        
+        let resultText = `REST API status: ${response.status} (${Math.round(endTime - startTime)}ms)\n`;
+        resultText += `Status text: ${response.statusText}\n\n`;
+        
+        try {
+          const data = await response.text();
+          resultText += `Response: ${data}`;
+        } catch (e) {
+          resultText += 'Could not parse response';
+        }
+        
+        resultDiv.className = response.ok ? 'result success' : 'result error';
+        resultDiv.textContent = resultText;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `REST API test failed: ${error.message}`;
+      }
+    }
+    
+    async function runNetworkDiagnosis() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const resultDiv = document.getElementById('diagnosticsResult');
+      
+      if (!url) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 'Please enter a Supabase URL first';
+        return;
+      }
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = 'Running diagnostics...';
+      
+      const domain = new URL(url).hostname;
+      let diagnosis = '';
+      
+      // Basic info
+      diagnosis += `Domain: ${domain}\n`;
+      diagnosis += `User Agent: ${navigator.userAgent}\n`;
+      diagnosis += `Online Status: ${navigator.onLine ? 'Online' : 'Offline'}\n\n`;
+      
+      // Connection test
+      try {
+        const startTime = performance.now();
+        await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+        const endTime = performance.now();
+        diagnosis += `Connection: Success (${Math.round(endTime - startTime)}ms)\n`;
+      } catch (error) {
+        diagnosis += `Connection: Failed (${error.message})\n`;
+      }
+      
+      // Additional network info if available
+      if (navigator.connection) {
+        const conn = navigator.connection;
+        diagnosis += `\nNetwork Information:\n`;
+        diagnosis += `Downlink: ${conn.downlink} Mbps\n`;
+        diagnosis += `Effective Type: ${conn.effectiveType}\n`;
+        diagnosis += `Round-Trip Time: ${conn.rtt}ms\n`;
+        diagnosis += `Save-Data: ${conn.saveData ? 'Enabled' : 'Disabled'}\n`;
+      }
+      
+      diagnosis += `\nPossible issues:\n`;
+      diagnosis += `- DNS resolution problem\n`;
+      diagnosis += `- Firewall or security software blocking the connection\n`;
+      diagnosis += `- Network configuration issues\n`;
+      diagnosis += `- Supabase service outage\n`;
+      diagnosis += `- Invalid project URL or credentials\n\n`;
+      
+      diagnosis += `Recommendations:\n`;
+      diagnosis += `- Check Supabase Status Page (https://status.supabase.com)\n`;
+      diagnosis += `- Verify project URL and API key in Supabase dashboard\n`;
+      diagnosis += `- Try accessing from a different network or device\n`;
+      diagnosis += `- Try disabling VPN, proxies or firewalls\n`;
+      diagnosis += `- Check browser console for CORS errors\n`;
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = diagnosis;
+    }
+  </script>
+</body>
+</html>

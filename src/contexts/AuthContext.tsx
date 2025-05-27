@@ -44,7 +44,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const validateServiceRoleClient = useCallback(async (): Promise<boolean> => {
     // Check if the client exists
     if (!serviceRoleClient) {
+      console.error('Service role client is null - not initialized');
       return false;
+    }
+    
+    // Validate the JWT token format
+    const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY as string;
+    if (serviceRoleKey) {
+      try {
+        // Simple JWT validation to catch common issues
+        const parts = serviceRoleKey.split('.');
+        if (parts.length !== 3) {
+          console.error('Service role key is not a valid JWT (should have 3 parts separated by dots)');
+          return false;
+        }
+        
+        // Decode the payload (middle part) to check for correct claims
+        const payloadBase64 = parts[1];
+        const payloadJson = atob(payloadBase64);
+        const payload = JSON.parse(payloadJson);
+        
+        // Check for the role claim which is critical
+        if (!payload.role || payload.role !== 'service_role') {
+          console.error('JWT payload does not contain the correct "role" claim:', payload);
+          return false;
+        }
+        
+        console.log('Service role JWT validation passed');
+      } catch (jwtErr) {
+        console.error('Error validating JWT format:', jwtErr);
+        return false;
+      }
     }
     
     try {
@@ -53,9 +83,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Service role client validation failed:', error.message);
+        
+        // Check for permission errors which indicate JWT issues
+        if (error.message.includes('JWTClaimValidationFailed') || 
+            error.message.includes('permission') ||
+            error.message.includes('JWT')) {
+          console.error('JWT validation error - likely invalid service role key');
+        }
+        
         return false;
       }
       
+      console.log('Service role client successfully validated');
       return true;
     } catch (err) {
       console.error('Error validating service role client:', err);
@@ -80,14 +119,73 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }
     } else {
+      // Basic JWT format validation
+      try {
+        const parts = serviceRoleKey.split('.');
+        if (parts.length !== 3) {
+          console.error('Service role key is not a valid JWT format');
+          if (import.meta.env.DEV) {
+            toast({
+              title: "JWT Format Error",
+              description: "Your service role key doesn't appear to be a valid JWT token (should have 3 parts separated by dots).",
+              variant: "destructive"
+            });
+          }
+        } else {
+          // Decode the payload to check for correct claims
+          try {
+            const payloadBase64 = parts[1];
+            const payloadJson = atob(payloadBase64);
+            const payload = JSON.parse(payloadJson);
+            
+            // Check explicitly for common typos in the role claim
+            if (payload.rose && !payload.role) {
+              console.error('JWT contains "rose" claim instead of "role" - this is a typo in the JWT');
+              toast({
+                title: "JWT Claim Error",
+                description: 'Your service role key has a typo: "rose" instead of "role". Please correct your JWT token.',
+                variant: "destructive"
+              });
+            } else if (!payload.role) {
+              console.error('JWT is missing the "role" claim');
+              if (import.meta.env.DEV) {
+                toast({
+                  title: "JWT Claim Missing",
+                  description: 'Your service role key is missing the "role" claim. This will prevent authentication.',
+                  variant: "destructive"
+                });
+              }
+            } else if (payload.role !== 'service_role') {
+              console.error('JWT has incorrect role value:', payload.role);
+              if (import.meta.env.DEV) {
+                toast({
+                  title: "JWT Role Invalid",
+                  description: `Your service role key has role="${payload.role}" instead of "service_role". This will cause authentication issues.`,
+                  variant: "destructive"
+                });
+              }
+            }
+          } catch (decodeErr) {
+            console.error('Failed to decode JWT payload:', decodeErr);
+          }
+        }
+      } catch (jwtErr) {
+        console.error('Error checking JWT format:', jwtErr);
+      }
+      
       // If key exists, validate that the service role client works correctly
       validateServiceRoleClient().then(isValid => {
-        if (!isValid && import.meta.env.DEV) {
-          toast({
-            title: "API Key Validation Failed", 
-            description: "Your Supabase service role key may be invalid. Check the key in your .env file.",
-            variant: "destructive"
-          });
+        if (!isValid) {
+          const message = "Your Supabase service role key may be invalid. Check the key in your .env file.";
+          console.error(message);
+          
+          if (import.meta.env.DEV) {
+            toast({
+              title: "API Key Validation Failed", 
+              description: message,
+              variant: "destructive"
+            });
+          }
         }
       });
     }
@@ -320,6 +418,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string): Promise<SignInResponse> => {
     try {
       setLoading(true);
+      
+      // First perform a comprehensive connection check to Supabase
+      try {
+        // First try to reach the domain with a HEAD request
+        const response = await fetch(import.meta.env.VITE_SUPABASE_URL, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          // Set a reasonable timeout to avoid long waits
+          signal: AbortSignal.timeout(5000)
+        });
+        console.log('Supabase connection check:', response.type);
+        
+        // Additional connectivity test to the auth endpoint specifically
+        const authEndpoint = `${import.meta.env.VITE_SUPABASE_URL}/auth/v1/`;
+        try {
+          await fetch(authEndpoint, { 
+            method: 'OPTIONS',
+            signal: AbortSignal.timeout(3000)
+          });
+        } catch (authError) {
+          console.warn('Auth endpoint check failed, but main URL accessible:', authError);
+          // Continue since the main URL is reachable
+        }
+      } catch (connectionError) {
+        console.error('Connection to Supabase failed:', connectionError);
+        
+        // Classify the error to give more helpful messages
+        const errorString = String(connectionError);
+        let errorMessage = "Could not connect to authentication service. Check your internet connection and try again.";
+        
+        if (errorString.includes('ERR_NAME_NOT_RESOLVED')) {
+          errorMessage = "DNS resolution failed. The Supabase domain could not be found. Check your internet connection or try using a different network.";
+        } else if (errorString.includes('AbortError') || errorString.includes('timeout')) {
+          errorMessage = "Connection timed out. The authentication service is taking too long to respond. Try again later or check if there are any service outages.";
+        } else if (errorString.includes('ERR_CONNECTION_REFUSED')) {
+          errorMessage = "Connection refused. The authentication service is not accepting connections. This could be a temporary issue.";
+        }
+        
+        toast({
+          title: "Connection failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
+        return { data: null, error: new AuthError(`Connection failed: ${errorString.substring(0, 100)}`) };
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -332,15 +476,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Sign in error:', error);
       const authError = error as AuthError;
       let errorMessage = authError.message;
+      let errorTitle = "Sign in failed";
       
+      // Classify and provide more helpful error messages
       if (errorMessage === 'Invalid login credentials') {
         errorMessage = 'Invalid email or password. Please check your credentials and try again.';
       } else if (errorMessage.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        // Since we're disabling email verification, this shouldn't happen anymore
+        // If it does, it's likely a backend configuration issue
+        errorMessage = 'Your account needs verification. Please try signing up again or contact support.';
+        errorTitle = "Verification needed";
+      } else if (
+        errorMessage.includes('Failed to fetch') || 
+        errorMessage.includes('NetworkError') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('ERR_CONNECTION') ||
+        errorMessage.includes('ERR_NAME_NOT_RESOLVED') ||
+        errorMessage.includes('timed out') ||
+        errorMessage.includes('ENOTFOUND')
+      ) {
+        errorMessage = 'Network error. Please check your internet connection and try again. If the problem persists, the authentication service may be temporarily unavailable.';
+        errorTitle = "Connection error";
+        
+        // Record specific error for debugging
+        console.error('Network-related auth error:', {
+          message: errorMessage,
+          originalError: error
+        });
+      } else if (errorMessage.includes('JWT')) {
+        errorMessage = 'Authentication token error. This might be a configuration issue with the authentication service.';
+        errorTitle = "Authentication error";
       }
       
       toast({
-        title: "Sign in failed",
+        title: errorTitle,
         description: errorMessage,
         variant: "destructive"
       });
@@ -418,6 +587,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setLoading(true);
       
+      // First perform a comprehensive connection check to Supabase
+      try {
+        // First try to reach the domain with a HEAD request
+        const response = await fetch(import.meta.env.VITE_SUPABASE_URL, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          // Set a reasonable timeout to avoid long waits
+          signal: AbortSignal.timeout(5000)
+        });
+        console.log('Supabase connection check during signup:', response.type);
+        
+        // Additional connectivity test to the auth endpoint specifically
+        const authEndpoint = `${import.meta.env.VITE_SUPABASE_URL}/auth/v1/`;
+        try {
+          await fetch(authEndpoint, { 
+            method: 'OPTIONS',
+            signal: AbortSignal.timeout(3000)
+          });
+        } catch (authError) {
+          console.warn('Auth endpoint check failed during signup, but main URL accessible:', authError);
+          // Continue since the main URL is reachable
+        }
+      } catch (connectionError) {
+        console.error('Connection to Supabase failed during signup:', connectionError);
+        
+        // Classify the error to give more helpful messages
+        const errorString = String(connectionError);
+        let errorMessage = "Could not connect to authentication service. Check your internet connection and try again.";
+        
+        if (errorString.includes('ERR_NAME_NOT_RESOLVED')) {
+          errorMessage = "DNS resolution failed. The Supabase domain could not be found. Check your internet connection or try using a different network.";
+        } else if (errorString.includes('AbortError') || errorString.includes('timeout')) {
+          errorMessage = "Connection timed out. The authentication service is taking too long to respond. Try again later or check if there are any service outages.";
+        } else if (errorString.includes('ERR_CONNECTION_REFUSED')) {
+          errorMessage = "Connection refused. The authentication service is not accepting connections. This could be a temporary issue.";
+        }
+        
+        toast({
+          title: "Connection failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
+        return { data: null, error: new AuthError(`Connection failed during signup: ${errorString.substring(0, 100)}`) };
+      }
+      
       // Validate metadata first
       const validation = validateUserMetadata(metadata);
       if (!validation.valid) {
@@ -438,7 +652,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password,
         options: {
           data: metadata,
-          emailRedirectTo: window.location.origin + '/dashboard'
+          emailRedirectTo: window.location.origin + '/dashboard',
+          // Disable email verification completely
+          emailConfirm: false
         }
       });
 
@@ -446,6 +662,60 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Create a user profile record if the user was created successfully
       if (data.user) {
+        // Auto-confirm the user's email regardless of environment
+        // This ensures email verification is completely disabled
+        if (serviceRoleClient) {
+          try {
+            // First attempt: Update email_confirmed_at directly
+            const { error: directConfirmError } = await serviceRoleClient.auth.admin.updateUserById(
+              data.user.id,
+              { email_confirmed_at: new Date().toISOString() }
+            );
+            
+            if (directConfirmError) {
+              console.error('Failed to auto-confirm email (direct method):', directConfirmError);
+              
+              // Second attempt: Update user_metadata
+              const { error: confirmError } = await serviceRoleClient.auth.admin.updateUserById(
+                data.user.id,
+                { user_metadata: { email_confirmed: true } }
+              );
+              
+              if (confirmError) {
+                console.error('Failed to update user metadata:', confirmError);
+                
+                // Third attempt: Try using raw API call if all else fails
+                try {
+                  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/auth/v1/admin/users/${data.user.id}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      email_confirmed_at: new Date().toISOString()
+                    })
+                  });
+                  
+                  if (!response.ok) {
+                    console.error('Failed to confirm email via API call:', await response.text());
+                  } else {
+                    console.log('Email auto-confirmed via API call');
+                  }
+                } catch (apiErr) {
+                  console.error('Error with API confirmation method:', apiErr);
+                }
+              } else {
+                console.log('Email confirmed via user metadata update');
+              }
+            } else {
+              console.log('Email auto-confirmed via direct method');
+            }
+          } catch (confirmErr) {
+            console.error('Error during email confirmation bypass:', confirmErr);
+          }
+        }
+        
         // Wait a bit to allow the auth system to fully create the user
         await new Promise(resolve => setTimeout(resolve, 2000));
         
@@ -489,11 +759,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setShowProfileCompletion(true);
       }
 
-      // Check if user needs email confirmation
-      if (data.user && !data.session) {
+      // No need to check for email confirmation anymore since it's disabled
+      if (data.user) {
         toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link. Please click it to activate your account.",
+          title: "Account created",
+          description: "Your account has been created successfully. You can now log in.",
         });
       }
 
@@ -501,9 +771,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Sign up error:', error);
       const authError = error as AuthError;
+      let errorMessage = authError.message;
+      let errorTitle = "Sign up failed";
+      
+      // Classify and provide more helpful error messages
+      if (
+        errorMessage.includes('Failed to fetch') || 
+        errorMessage.includes('ERR_CONNECTION_CLOSED') || 
+        errorMessage.includes('ERR_NAME_NOT_RESOLVED') ||
+        errorMessage.includes('NetworkError') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('ERR_CONNECTION') ||
+        errorMessage.includes('timed out') ||
+        errorMessage.includes('ENOTFOUND')
+      ) {
+        errorMessage = 'Network error. Please check your internet connection and try again. If the problem persists, the authentication service may be temporarily unavailable.';
+        errorTitle = "Connection error";
+        
+        // Record detailed error for debugging
+        console.error('Network-related signup error:', {
+          message: errorMessage,
+          originalError: error
+        });
+      } else if (errorMessage.includes('user already exists')) {
+        errorMessage = 'A user with this email already exists. Please login instead or use a different email.';
+        errorTitle = "Account exists";
+      } else if (errorMessage.includes('JWT') || errorMessage.includes('token')) {
+        errorMessage = 'Authentication token error. This might be a configuration issue with the authentication service.';
+        errorTitle = "Authentication error";
+        
+        // This could indicate an issue with the service role key
+        console.error('JWT/token error during signup:', error);
+      } else if (errorMessage.includes('weak-password') || errorMessage.includes('password')) {
+        errorMessage = 'Please use a stronger password (at least 6 characters with a mix of letters, numbers and symbols).';
+        errorTitle = "Weak password";
+      }
+      
       toast({
-        title: "Sign up failed",
-        description: authError.message,
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive"
       });
       return { data: null, error: authError };
