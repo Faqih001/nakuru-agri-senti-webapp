@@ -9,6 +9,7 @@ const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [verificationMessage, setVerificationMessage] = useState<string>("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -47,29 +48,36 @@ const VerifyEmail = () => {
 
         if (response.ok && data.message) {
           setVerificationStatus('success');
+          setVerificationMessage("Your email has been successfully verified. Please wait while we complete the account setup...");
           toast({
             title: "Email verified!",
             description: "Your email has been successfully verified.",
           });
           
-          // Redirect to login page with verified flag and email after 3 seconds
+          // Extract email and redirectUrl from the response
+          const userEmail = data.user?.email || '';
+          const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
+          const redirectUrl = data.redirectUrl || (import.meta.env.PROD ? `${productionUrl}/auth` : '/auth');
+          
+          // Add a longer delay to give Supabase time to complete the user creation in the auth system
+          // This helps prevent foreign key constraint violations when creating user profiles
           setTimeout(() => {
-            // Extract email and redirectUrl from the response
-            const userEmail = data.user?.email || '';
-            const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
-            const redirectUrl = data.redirectUrl || (import.meta.env.PROD ? `${productionUrl}/auth` : '/auth');
+            setVerificationMessage("Account setup completed! Redirecting you to login...");
             
-            // Construct the full URL with query parameters
-            const redirectWithParams = `${redirectUrl}?verified=true&email=${encodeURIComponent(userEmail)}`;
-            
-            // Use window.location for full page redirect to external URL if needed
-            if (redirectUrl.startsWith('http')) {
-              window.location.href = redirectWithParams;
-            } else {
-              // Use navigate for internal routing
-              navigate(redirectWithParams);
-            }
-          }, 3000);
+            // Wait a bit more before redirecting
+            setTimeout(() => {
+              // Construct the full URL with query parameters
+              const redirectWithParams = `${redirectUrl}?verified=true&email=${encodeURIComponent(userEmail)}`;
+              
+              // Use window.location for full page redirect to external URL if needed
+              if (redirectUrl.startsWith('http')) {
+                window.location.href = redirectWithParams;
+              } else {
+                // Use navigate for internal routing
+                navigate(redirectWithParams);
+              }
+            }, 2000);
+          }, 5000);
         } else {
           throw new Error(data.error || 'Verification failed');
         }
@@ -97,7 +105,7 @@ const VerifyEmail = () => {
     success: {
       icon: <Check className="w-12 h-12 text-green-600" />,
       title: "Email Verified",
-      description: "Your email has been successfully verified. You'll be redirected to the login page shortly.",
+      description: verificationMessage || "Your email has been successfully verified. You'll be redirected to the login page shortly.",
       buttonText: "Go to Login"
     },
     error: {
@@ -131,13 +139,19 @@ const VerifyEmail = () => {
               {content.icon}
             </div>
             
-            {content.buttonText && (
+            {content.buttonText && verificationStatus !== 'success' && (
               <Button
                 className="w-full bg-green-600 hover:bg-green-700"
                 onClick={() => navigate(verificationStatus === 'success' ? '/auth' : '/resend-verification')}
               >
                 {content.buttonText}
               </Button>
+            )}
+
+            {verificationStatus === 'success' && (
+              <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+                <div className="h-full bg-green-600 animate-pulse" style={{ width: '100%' }}></div>
+              </div>
             )}
 
             <Link 
