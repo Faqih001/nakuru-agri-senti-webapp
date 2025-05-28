@@ -150,7 +150,7 @@ const VerifyEmail = () => {
 
             {verificationStatus === 'success' && (
               <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
-                <div className="h-full bg-green-600 animate-pulse" style={{ width: '100%' }}></div>
+                <div className="h-full w-full bg-green-600 animate-pulse"></div>
               </div>
             )}
 
