@@ -543,20 +543,96 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return false;
     
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update(profileData)
-        .eq('id', user.id);
+      // Validate the service role client first
+      const isServiceRoleValid = await validateServiceRoleClient();
+      
+      // Use the serviceRoleClient if available and valid, otherwise fall back to regular client
+      const client = (isServiceRoleValid && serviceRoleClient) ? serviceRoleClient : supabase;
+      
+      // Add retry mechanism with delay
+      const maxAttempts = 3;
+      let attempt = 0;
+      let success = false;
+      
+      while (attempt < maxAttempts && !success) {
+        attempt++;
         
-      if (error) {
-        console.error('Error updating user profile:', error);
-        toast({
-          title: "Profile update failed",
-          description: "Could not update your profile. Please try again.",
-          variant: "destructive"
-        });
-        return false;
+        console.log(`Attempting profile update (attempt ${attempt}/${maxAttempts})...`);
+        
+        // Add a small delay between retries (except for first attempt)
+        if (attempt > 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        }
+        
+        // First check if the profile exists
+        const { data: existingProfile } = await client
+          .from('user_profiles')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+          
+        let error;
+          
+        if (existingProfile) {
+          // If the profile exists, update it
+          const result = await client
+            .from('user_profiles')
+            .update(profileData)
+            .eq('id', user.id);
+            
+          error = result.error;
+        } else {
+          // If the profile doesn't exist yet, insert it with the ID
+          const result = await client
+            .from('user_profiles')
+            .insert({ 
+              id: user.id,
+              ...profileData 
+            });
+            
+          error = result.error;
+        }
+          
+        if (!error) {
+          success = true;
+        } else {
+          console.error(`Error updating user profile (attempt ${attempt}/${maxAttempts}):`, error);
+          
+          // If we're on the last attempt or we're retrying,
+        // try the upsert approach as a fallback
+        if (attempt === maxAttempts - 1 || attempt > 1) {
+          console.log('Trying upsert approach as fallback...');
+          const { error: upsertError } = await client
+            .from('user_profiles')
+            .upsert({
+              id: user.id,
+              ...profileData
+            }, {
+              onConflict: 'id',
+              ignoreDuplicates: false
+            });
+            
+          if (!upsertError) {
+            success = true;
+            break;
+          } else {
+            console.error('Fallback upsert failed:', upsertError);
+          }
+        }
+        
+        // If this is the last attempt, show the error toast
+        if (attempt === maxAttempts && !success) {
+          toast({
+            title: "Profile update failed",
+            description: "Could not update your profile. Please try again.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        }
       }
+      
+      if (success) {
       
       toast({
         title: "Profile updated",
@@ -567,6 +643,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setShowProfileCompletion(false);
       
       return true;
+      } else {
+        // This handles the case where all attempts failed but didn't throw an error
+        return false;
+      }
     } catch (error) {
       console.error('Exception during profile update:', error);
       toast({
