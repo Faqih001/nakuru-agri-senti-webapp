@@ -142,7 +142,7 @@ const VerifyEmail = () => {
             {content.buttonText && verificationStatus !== 'success' && (
               <Button
                 className="w-full bg-green-600 hover:bg-green-700"
-                onClick={() => navigate(verificationStatus === 'success' ? '/auth' : '/resend-verification')}
+                onClick={() => navigate('/resend-verification')}
               >
                 {content.buttonText}
               </Button>
