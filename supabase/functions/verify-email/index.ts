@@ -12,6 +12,13 @@ interface SecurityEventDetails {
   [key: string]: unknown;
 }
 
+interface UserProfile {
+  id: string;
+  email: string;
+  email_verified: boolean;
+  status: string;
+}
+
 serve(async (req) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
@@ -63,17 +70,53 @@ serve(async (req) => {
       throw new Error('Invalid user token');
     }
 
+    // Check if the user profile exists
+    const { data: existingProfile, error: fetchError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    // Add a small delay to ensure the auth system has fully created the user
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // If no profile exists, try to create one with basic information
+    if (!existingProfile && !fetchError) {
+      const newProfile = {
+        id: user.id,
+        email: user.email,
+        email_verified: true,
+        status: 'active',
+      };
+
+      // Try to create the profile
+      const { error: insertError } = await supabaseAdmin
+        .from('user_profiles')
+        .insert(newProfile);
+
+      if (insertError) {
+        console.error('Error creating user profile:', insertError);
+        // We'll continue since the frontend will also try to create the profile
+      }
+    }
+
     // Update user's email verification status
+    // We use upsert to either create or update the profile
     const { error: updateError } = await supabaseAdmin
       .from('user_profiles')
-      .update({ 
+      .upsert({ 
+        id: user.id,
+        email: user.email,
         email_verified: true,
-        status: 'active' as const
-      })
-      .eq('id', user.id);
+        status: 'active'
+      }, {
+        onConflict: 'id',
+        ignoreDuplicates: false
+      });
 
     if (updateError) {
-      throw updateError;
+      console.error('Error updating user profile:', updateError);
+      // Continue execution but log the error
     }
 
     // Log the security event
