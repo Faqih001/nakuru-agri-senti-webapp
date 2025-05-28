@@ -57,7 +57,8 @@ const VerifyEmail = () => {
           // Extract email and redirectUrl from the response
           const userEmail = data.user?.email || '';
           const productionUrl = 'https://nakuru-agri-senti-webapp.vercel.app';
-          const redirectUrl = data.redirectUrl || (import.meta.env.PROD ? `${productionUrl}/auth` : '/auth');
+          // Always use the production URL as requested
+          const redirectUrl = data.redirectUrl || `${productionUrl}/auth`;
           
           // Add a longer delay to give Supabase time to complete the user creation in the auth system
           // This helps prevent foreign key constraint violations when creating user profiles
