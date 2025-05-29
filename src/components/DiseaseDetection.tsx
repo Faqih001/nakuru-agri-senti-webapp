@@ -50,39 +50,95 @@ export const DiseaseDetection = () => {
 
     setIsAnalyzing(true);
     
-    // Simulate AI analysis
-    setTimeout(() => {
-      const mockResults = [
+    try {
+      // Get the generative model with vision capability
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro-vision" });
+      
+      // Convert base64 image to correct format for Gemini API
+      // Remove the prefix (e.g., "data:image/jpeg;base64,")
+      const base64String = selectedImage.split(',')[1];
+      
+      // Create image part for the model
+      const imageParts = [
         {
-          disease: "Fall Armyworm",
-          confidence: 87,
-          severity: "Medium",
-          description: "Early stage fall armyworm infestation detected on maize leaves",
-          treatment: "Apply Chlorpyrifos or Emamectin benzoate. Scout weekly and destroy egg masses.",
-          prevention: "Use pheromone traps, intercrop with beans, apply neem oil weekly"
+          inlineData: {
+            data: base64String,
+            mimeType: "image/jpeg", // Adjust based on actual image type if needed
+          },
         },
-        {
-          disease: "Maize Streak Virus",
-          confidence: 92,
-          severity: "High", 
-          description: "Yellow streaking pattern characteristic of maize streak virus",
-          treatment: "No direct cure. Remove infected plants. Control leafhopper vectors.",
-          prevention: "Use resistant varieties, control weeds, apply insecticides for leafhoppers"
-        },
-        {
-          disease: "Healthy Plant",
-          confidence: 95,
-          severity: "None",
-          description: "Plant appears healthy with good leaf color and structure",
-          treatment: "Continue current care routine",
-          prevention: "Maintain proper spacing, adequate nutrition, and regular monitoring"
-        }
       ];
       
-      const randomResult = mockResults[Math.floor(Math.random() * mockResults.length)];
-      setAnalysisResult(randomResult);
+      // Create prompt for plant disease analysis
+      const prompt = `
+      Analyze this crop image for any signs of disease or pest infestation. 
+      Focus on identifying common plant diseases and pests in Nakuru, Kenya.
+      
+      For any identified issue, provide the following information in a structured format:
+      1. Disease/pest name
+      2. Confidence level (as a percentage)
+      3. Severity level (None, Low, Medium, High)
+      4. Brief description of what you're seeing
+      5. Recommended treatment options
+      6. Prevention measures
+      
+      If the plant appears healthy, please indicate that as well.
+      Provide your analysis in a structured format that can be easily parsed.
+      `;
+      
+      // Generate content with the image
+      const result = await model.generateContent([prompt, ...imageParts]);
+      const response = await result.response;
+      const text = response.text();
+      
+      // Parse the response to extract structured information
+      // This is a simplified parsing - you may need to adjust based on actual response format
+      let parsedResult: AnalysisResult;
+      
+      try {
+        // For demonstration, we'll use regex to extract information
+        // In a production app, you might want to be more precise with parsing
+        const diseaseName = text.match(/disease\/pest name:?\s*([^\n]+)/i)?.[1] || "Unknown Issue";
+        const confidenceMatch = text.match(/confidence:?\s*(\d+)%?/i);
+        const confidence = confidenceMatch ? parseInt(confidenceMatch[1]) : 80;
+        const severityMatch = text.match(/severity:?\s*(none|low|medium|high)/i);
+        const severity = (severityMatch ? severityMatch[1].charAt(0).toUpperCase() + severityMatch[1].slice(1) : "Medium");
+        const description = text.match(/description:?\s*([^\n]+(\n[^\n]+)*?)(\n\n|\n[a-z]+:)/i)?.[1] || "Analysis inconclusive";
+        const treatment = text.match(/treatment:?\s*([^\n]+(\n[^\n]+)*?)(\n\n|\n[a-z]+:)/i)?.[1] || "Consult with a local agricultural extension officer";
+        const prevention = text.match(/prevention:?\s*([^\n]+(\n[^\n]+)*?)(\n\n|\n[a-z]+:|$)/i)?.[1] || "Regular monitoring and proper farm hygiene";
+        
+        parsedResult = {
+          disease: diseaseName,
+          confidence: confidence,
+          severity: severity,
+          description: description,
+          treatment: treatment,
+          prevention: prevention
+        };
+      } catch (parseError) {
+        console.error("Error parsing AI response:", parseError);
+        
+        // Fallback result
+        parsedResult = {
+          disease: "Analysis Inconclusive",
+          confidence: 60,
+          severity: "Medium",
+          description: "The image analysis was inconclusive. The AI model couldn't clearly identify the issue.",
+          treatment: "Consider taking a clearer photo or consulting with a local agricultural extension officer.",
+          prevention: "Regular crop monitoring and maintaining farm hygiene practices."
+        };
+      }
+      
+      setAnalysisResult(parsedResult);
+    } catch (error) {
+      console.error("Error analyzing image with Gemini:", error);
+      toast({
+        title: "Analysis failed",
+        description: "Could not analyze the image. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const getSeverityColor = (severity: string) => {
