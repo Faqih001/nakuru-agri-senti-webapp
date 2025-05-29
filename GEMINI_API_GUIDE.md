@@ -30,7 +30,7 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 const generateContent = async (prompt: string): Promise<string> => {
   try {
     // Get the generative model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
     // Generate content
     const result = await model.generateContent(prompt);
@@ -49,7 +49,7 @@ const generateContent = async (prompt: string): Promise<string> => {
 // For components that need to analyze images
 const analyzeImage = async (imageBase64: string, prompt: string): Promise<string> => {
   // Get the model with vision capability
-  const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro-vision" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   
   // Prepare the image part
   const imagePart = {
