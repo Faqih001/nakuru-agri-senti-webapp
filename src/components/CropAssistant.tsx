@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Message {
   id: string;
@@ -18,6 +19,10 @@ interface Message {
 }
 
 export const CropAssistant = () => {
+  // Initialize Gemini API
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
