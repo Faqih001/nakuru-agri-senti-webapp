@@ -11,7 +11,7 @@ The Gemini API key is stored in the environment variable `VITE_GEMINI_API_KEY`. 
 The following components use the Gemini AI API:
 
 1. **CropAssistant** (`/src/components/CropAssistant.tsx`) - Uses Gemini 2.0 Flash for intelligent farming advice
-2. **DiseaseDetection** (`/src/components/DiseaseDetection.tsx`) - Uses Gemini 2.0 Flash for plant disease detection 
+2. **DiseaseDetection** (`/src/components/DiseaseDetection.tsx`) - Uses Gemini 2.0 Flash for plant disease detection
 3. **WeatherDashboard** (`/src/pages/WeatherDashboard.tsx`) - Uses Gemini 2.0 Flash for weather-based farming insights
 4. **AIChatbot** (`/src/components/AIChatbot.tsx`) - Uses Gemini 2.5 Flash Preview for the general AI chatbot
 
@@ -31,7 +31,6 @@ const generateContent = async (prompt: string): Promise<string> => {
   try {
     // Get the generative model
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    
     // Generate content
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -50,7 +49,6 @@ const generateContent = async (prompt: string): Promise<string> => {
 const analyzeImage = async (imageBase64: string, prompt: string): Promise<string> => {
   // Get the model with vision capability
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-  
   // Prepare the image part
   const imagePart = {
     inlineData: {
