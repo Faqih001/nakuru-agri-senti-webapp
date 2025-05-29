@@ -123,8 +123,8 @@ export const CropAssistant = () => {
 
   const generateGeminiResponse = async (question: string): Promise<string> => {
     try {
-      // Get the generative model (Gemini-1.0-pro)
-      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+      // Get the generative model (upgraded to Gemini-2.0-flash)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       
       // Create the prompt with context about farming in Nakuru, Kenya
       const prompt = `
