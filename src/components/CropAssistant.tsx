@@ -81,13 +81,12 @@ export const CropAssistant = () => {
     
     setMessages(prev => [...prev, thinkingMessage]);
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      // Get response from Gemini API
+      const response = await generateGeminiResponse(inputValue);
+      
       // Remove the thinking message and add the actual response
       setMessages(prev => prev.filter(m => !m.thinking));
-      
-      // Get contextual response based on the question
-      const response = generateResponse(inputValue);
       
       const botMessage: Message = {
         id: (Date.now() + 100).toString(),
@@ -97,27 +96,62 @@ export const CropAssistant = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Error generating response:", error);
+      
+      // Remove thinking message and show error
+      setMessages(prev => prev.filter(m => !m.thinking));
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 100).toString(),
+        text: "Sorry, I'm having trouble generating a response. Please try again later.",
+        sender: "bot",
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: "Error",
+        description: "Failed to generate a response. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
-  const generateResponse = (question: string): string => {
-    const lowerCaseQuestion = question.toLowerCase();
-    
-    if (lowerCaseQuestion.includes('fertilizer') || lowerCaseQuestion.includes('fertiliser')) {
-      return "For maize crops in Nakuru's soil conditions, I recommend DAP fertilizer during planting (120kg/acre), followed by CAN top-dressing (100kg/acre) when the plants are knee-high. Always soil test first for the most accurate recommendations.";
-    } 
-    else if (lowerCaseQuestion.includes('pest') || lowerCaseQuestion.includes('disease')) {
-      return "Common pests in Nakuru include fall armyworm and stalk borers. For management, consider push-pull technology using desmodium and napier grass as border crops. For chemical control, use products containing lambda-cyhalothrin following manufacturer instructions and safety precautions.";
-    }
-    else if (lowerCaseQuestion.includes('weather') || lowerCaseQuestion.includes('rain')) {
-      return "Based on current forecasts for Nakuru County, we expect moderate rainfall (15-25mm) over the next 5 days. Temperatures will range from 12°C at night to 24°C during the day. This is favorable weather for crops in the vegetative stage.";
-    }
-    else if (lowerCaseQuestion.includes('planting') || lowerCaseQuestion.includes('season')) {
-      return "The main planting season in Nakuru typically starts in March-April with the long rains. For maize, plant when soil moisture is adequate, using certified seeds appropriate for your altitude. Space rows 75cm apart with 30cm between plants for optimal yields.";
-    }
-    else {
-      return "Thank you for your question. Based on farming practices in Nakuru County, I recommend integrating crop rotation with legumes like beans to improve soil fertility. Would you like more specific information about particular crops or farming techniques?";
+  const generateGeminiResponse = async (question: string): Promise<string> => {
+    try {
+      // Get the generative model (Gemini-1.0-pro)
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+      
+      // Create the prompt with context about farming in Nakuru, Kenya
+      const prompt = `
+      Act as an agricultural assistant for farmers in Nakuru County, Kenya. 
+      You are an expert in African agriculture, specifically for the Nakuru region.
+      Provide helpful, accurate advice about:
+      - Local crops (maize, beans, potatoes, vegetables, etc.)
+      - Farming practices suitable for Nakuru's climate and soil
+      - Pest and disease management relevant to this region
+      - Fertilizer recommendations appropriate for local soil conditions
+      - Weather patterns and planting schedules for Nakuru
+      
+      User question: ${question}
+      
+      Keep your answers practical, specific to Nakuru County, and suitable for smallholder farmers. 
+      Respond in a helpful, concise manner with actionable advice.
+      `;
+      
+      // Generate content using Gemini API
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      return text;
+    } catch (error) {
+      console.error("Error calling Gemini API:", error);
+      throw new Error("Failed to generate response from Gemini API");
     }
   };
 
