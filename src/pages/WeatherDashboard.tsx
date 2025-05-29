@@ -1,5 +1,9 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ThermometerSun, Wind, Droplets, Sun, CloudRain, Clock } from "lucide-react";
+import { ThermometerSun, Wind, Droplets, Sun, CloudRain, Clock, AlertTriangle } from "lucide-react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 export const WeatherDashboard = () => {
   // Mock data
