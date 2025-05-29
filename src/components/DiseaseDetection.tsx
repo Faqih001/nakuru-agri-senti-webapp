@@ -51,8 +51,8 @@ export const DiseaseDetection = () => {
     setIsAnalyzing(true);
     
     try {
-      // Get the generative model with vision capability
-      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro-vision" });
+      // Get the generative model with vision capability (upgraded to Gemini-2.0-flash)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       
       // Convert base64 image to correct format for Gemini API
       // Remove the prefix (e.g., "data:image/jpeg;base64,")
