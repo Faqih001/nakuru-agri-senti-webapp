@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThermometerSun, Wind, Droplets, Sun, CloudRain, Clock, AlertTriangle } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -34,7 +34,8 @@ export const WeatherDashboard = () => {
   };
   
   // Get farming insights based on weather data
-  const getFarmingInsights = async () => {
+  // Using useCallback to memoize the function so it can be used in useEffect deps
+  const getFarmingInsights = useCallback(async () => {
     setLoading(true);
     setInsightError("");
     
@@ -87,7 +88,7 @@ export const WeatherDashboard = () => {
   // Get insights on initial load
   useEffect(() => {
     getFarmingInsights();
-  }, []);
+  }, [getFarmingInsights]);
 
   return (
     <div className="space-y-6">
@@ -192,6 +193,48 @@ export const WeatherDashboard = () => {
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+      
+      {/* AI-Powered Farming Insights */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span>AI-Powered Farming Insights</span>
+            {loading && (
+              <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-green-600 border-r-transparent"></div>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {insightError ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{insightError}</AlertDescription>
+            </Alert>
+          ) : loading ? (
+            <div className="h-24 flex items-center justify-center">
+              <div className="text-sm text-gray-500">Generating farming insights...</div>
+            </div>
+          ) : (
+            <>
+              <div className="prose prose-sm max-w-none">
+                <p className="whitespace-pre-line text-gray-700">{farmingInsight}</p>
+              </div>
+              <div className="mt-4 text-right">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={getFarmingInsights}
+                  disabled={loading}
+                  className="text-green-600 border-green-600 hover:bg-green-50"
+                >
+                  {loading ? "Updating..." : "Update Insights"}
+                </Button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
