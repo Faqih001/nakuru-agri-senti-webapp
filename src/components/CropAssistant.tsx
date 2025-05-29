@@ -123,7 +123,30 @@ export const CropAssistant = () => {
     }
   };
 
-  const suggestedQuestions = [
+  const quickQuestions = [
+    "What fertilizer should I use?",
+    "How to control pests?",
+    "When should I plant?",
+    "Weather forecast for Nakuru"
+  ];
+  
+  return (
+    <div className="h-full flex flex-col">
+      <Card className="flex-1 flex flex-col overflow-hidden border shadow-md">
+        <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+          <ScrollArea className="flex-1 overflow-y-auto p-4">
+            <div className="flex flex-col space-y-4">
+              {messages.map((message) => (
+                <div 
+                  key={message.id}
+                  className={`flex items-start gap-2 ${
+                    message.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  {message.sender === "bot" && (
+                    <div className="bg-green-600 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+                      <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    </div>
                   )}
                   
                   <div
@@ -185,9 +208,10 @@ export const CropAssistant = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about crops, weather, fertilizers..."
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                onKeyDown={handleKeyDown}
                 disabled={isLoading}
                 className="text-sm flex-1 min-w-0"
+                ref={inputRef}
               />
               <Button 
                 onClick={handleSendMessage} 
@@ -203,4 +227,3 @@ export const CropAssistant = () => {
       </Card>
     </div>
   );
-};
