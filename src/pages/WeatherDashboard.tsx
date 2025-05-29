@@ -33,8 +33,7 @@ export const WeatherDashboard = () => {
     ],
   };
   
-  // Get farming insights based on weather data
-  // Using useCallback to memoize the function so it can be used in useEffect deps
+  // Get farming insights based on weather data using Gemini API
   const getFarmingInsights = useCallback(async () => {
     setLoading(true);
     setInsightError("");
@@ -83,7 +82,7 @@ export const WeatherDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [genAI, weatherData]);
   
   // Get insights on initial load
   useEffect(() => {
