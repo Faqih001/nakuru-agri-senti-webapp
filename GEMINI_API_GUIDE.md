@@ -78,8 +78,9 @@ const analyzeImage = async (imageBase64: string, prompt: string): Promise<string
 3. **Craft effective prompts** that provide context relevant to farming in Nakuru, Kenya.
 
 4. **Use the right model** for each task:
-   - Text: `gemini-1.0-pro`
-   - Images: `gemini-1.0-pro-vision`
+   - Text: `gemini-2.0-flash`
+   - Images: `gemini-2.0-flash`
+   - Advanced chatbot: `gemini-2.5-flash-preview-05-20`
 
 ## Resources
 
