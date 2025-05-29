@@ -227,3 +227,4 @@ export const CropAssistant = () => {
       </Card>
     </div>
   );
+};
