@@ -39,7 +39,7 @@ export const WeatherDashboard = () => {
     setInsightError("");
     
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       
       const weatherSummary = `
         Current weather in Nakuru: ${weatherData.current.temperature}°C, ${weatherData.current.condition}
