@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThermometerSun, Wind, Droplets, Sun, CloudRain, Clock, AlertTriangle } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -6,9 +6,9 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
 export const WeatherDashboard = () => {
-  // Initialize Gemini API
+  // Initialize Gemini API with useMemo to prevent recreating on every render
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
-  const genAI = new GoogleGenerativeAI(API_KEY);
+  const genAI = useMemo(() => new GoogleGenerativeAI(API_KEY), [API_KEY]);
   
   const [loading, setLoading] = useState(false);
   const [farmingInsight, setFarmingInsight] = useState("");
