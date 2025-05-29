@@ -67,6 +67,7 @@ const analyzeImage = async (imageBase64: string, prompt: string): Promise<string
 ### Best Practices
 
 1. **Use React's `useMemo` hook** to prevent recreating the Gemini client on each render:
+
    ```typescript
    const genAI = useMemo(() => new GoogleGenerativeAI(API_KEY), [API_KEY]);
    ```
