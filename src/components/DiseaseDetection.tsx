@@ -16,6 +16,10 @@ interface AnalysisResult {
 }
 
 export const DiseaseDetection = () => {
+  // Initialize Gemini API
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
