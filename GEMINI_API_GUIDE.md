@@ -10,10 +10,10 @@ The Gemini API key is stored in the environment variable `VITE_GEMINI_API_KEY`. 
 
 The following components use the Gemini AI API:
 
-1. **CropAssistant** (`/src/components/CropAssistant.tsx`) - Uses Gemini Pro for intelligent farming advice
-2. **DiseaseDetection** (`/src/components/DiseaseDetection.tsx`) - Uses Gemini Pro Vision for plant disease detection 
-3. **WeatherDashboard** (`/src/pages/WeatherDashboard.tsx`) - Uses Gemini Pro for weather-based farming insights
-4. **AIChatbot** (`/src/components/AIChatbot.tsx`) - Uses Gemini to power the general AI chatbot
+1. **CropAssistant** (`/src/components/CropAssistant.tsx`) - Uses Gemini 2.0 Flash for intelligent farming advice
+2. **DiseaseDetection** (`/src/components/DiseaseDetection.tsx`) - Uses Gemini 2.0 Flash for plant disease detection 
+3. **WeatherDashboard** (`/src/pages/WeatherDashboard.tsx`) - Uses Gemini 2.0 Flash for weather-based farming insights
+4. **AIChatbot** (`/src/components/AIChatbot.tsx`) - Uses Gemini 2.5 Flash Preview for the general AI chatbot
 
 ## How to Use Gemini API
 
