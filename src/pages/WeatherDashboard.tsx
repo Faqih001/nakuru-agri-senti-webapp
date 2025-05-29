@@ -6,7 +6,15 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
 export const WeatherDashboard = () => {
-  // Mock data
+  // Initialize Gemini API
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  
+  const [loading, setLoading] = useState(false);
+  const [farmingInsight, setFarmingInsight] = useState("");
+  const [insightError, setInsightError] = useState("");
+  
+  // Mock data for weather - we'll keep this since real weather API integration would be separate
   const weatherData = {
     current: {
       temperature: 24,
@@ -24,6 +32,62 @@ export const WeatherDashboard = () => {
       { day: "Friday", temp: 24, icon: Sun },
     ],
   };
+  
+  // Get farming insights based on weather data
+  const getFarmingInsights = async () => {
+    setLoading(true);
+    setInsightError("");
+    
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+      
+      const weatherSummary = `
+        Current weather in Nakuru: ${weatherData.current.temperature}°C, ${weatherData.current.condition}
+        Humidity: ${weatherData.current.humidity}%
+        Wind Speed: ${weatherData.current.windSpeed} km/h
+        Precipitation: ${weatherData.current.precipitation} mm
+        
+        5-Day Forecast:
+        - Today: ${weatherData.forecast[0].temp}°C
+        - Tomorrow: ${weatherData.forecast[1].temp}°C
+        - Wednesday: ${weatherData.forecast[2].temp}°C
+        - Thursday: ${weatherData.forecast[3].temp}°C
+        - Friday: ${weatherData.forecast[4].temp}°C
+      `;
+      
+      const prompt = `
+        Based on the following weather data for Nakuru, Kenya, provide practical farming advice
+        for local farmers. Consider seasonal crops common in Nakuru County, such as maize, beans,
+        potatoes, and vegetables.
+        
+        ${weatherSummary}
+        
+        Provide specific recommendations about:
+        1. What farming activities are recommended in these weather conditions
+        2. Any precautions farmers should take
+        3. Optimal irrigation advice given the forecast
+        4. Pest or disease risks that might increase in these conditions
+        
+        Keep your response under 200 words, practical, and specific to Nakuru's agricultural context.
+      `;
+      
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      setFarmingInsight(text);
+    } catch (error) {
+      console.error("Error getting farming insights:", error);
+      setInsightError("Failed to generate farming insights. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Get insights on initial load
+  useEffect(() => {
+    getFarmingInsights();
+  }, []);
 
   return (
     <div className="space-y-6">
