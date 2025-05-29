@@ -1,16 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot, User, Image, Mic, Paperclip, Loader2, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 interface Message {
   id: string;
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
+  thinking?: boolean;
 }
 
 export const CropAssistant = () => {
@@ -26,6 +30,18 @@ export const CropAssistant = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,81 +65,65 @@ export const CropAssistant = () => {
     setInputValue("");
     setIsLoading(true);
 
-    // Simulate AI response
+    // Add immediate "thinking" indicator message
+    const thinkingMessage: Message = {
+      id: `thinking-${Date.now().toString()}`,
+      text: "Thinking...",
+      sender: "bot",
+      timestamp: new Date(),
+      thinking: true
+    };
+    
+    setMessages(prev => [...prev, thinkingMessage]);
+
+    // Simulate API call delay
     setTimeout(() => {
-      const botResponse = generateBotResponse(inputValue);
+      // Remove the thinking message and add the actual response
+      setMessages(prev => prev.filter(m => !m.thinking));
+      
+      // Get contextual response based on the question
+      const response = generateResponse(inputValue);
+      
       const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse,
+        id: (Date.now() + 100).toString(),
+        text: response,
         sender: "bot",
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, botMessage]);
       setIsLoading(false);
-    }, 1500);
+    }, 2000);
   };
 
-  const generateBotResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
+  const generateResponse = (question: string): string => {
+    const lowerCaseQuestion = question.toLowerCase();
     
-    if (input.includes("maize") || input.includes("corn")) {
-      return "For maize in Nakuru: Plant during long rains (March-May). Use DAP fertilizer at planting (50kg/acre) and top-dress with CAN after 6 weeks. Watch for fall armyworm - inspect weekly. Current market price: KSh 35-40/kg in Nakuru town.";
+    if (lowerCaseQuestion.includes('fertilizer') || lowerCaseQuestion.includes('fertiliser')) {
+      return "For maize crops in Nakuru's soil conditions, I recommend DAP fertilizer during planting (120kg/acre), followed by CAN top-dressing (100kg/acre) when the plants are knee-high. Always soil test first for the most accurate recommendations.";
+    } 
+    else if (lowerCaseQuestion.includes('pest') || lowerCaseQuestion.includes('disease')) {
+      return "Common pests in Nakuru include fall armyworm and stalk borers. For management, consider push-pull technology using desmodium and napier grass as border crops. For chemical control, use products containing lambda-cyhalothrin following manufacturer instructions and safety precautions.";
     }
-    
-    if (input.includes("beans")) {
-      return "Beans grow well in Nakuru's climate. Plant at start of rains. Space rows 30cm apart. No nitrogen fertilizer needed - beans fix their own! Watch for bean fly and aphids. Harvest when pods are dry. Current price: KSh 80-120/kg.";
+    else if (lowerCaseQuestion.includes('weather') || lowerCaseQuestion.includes('rain')) {
+      return "Based on current forecasts for Nakuru County, we expect moderate rainfall (15-25mm) over the next 5 days. Temperatures will range from 12°C at night to 24°C during the day. This is favorable weather for crops in the vegetative stage.";
     }
-    
-    if (input.includes("potato")) {
-      return "Potatoes are perfect for Nakuru highlands! Plant certified seeds during cool season. Hill soil around plants as they grow. Apply manure and NPK fertilizer. Harvest after 3-4 months when leaves turn yellow. Good market demand - KSh 40-60/kg.";
+    else if (lowerCaseQuestion.includes('planting') || lowerCaseQuestion.includes('season')) {
+      return "The main planting season in Nakuru typically starts in March-April with the long rains. For maize, plant when soil moisture is adequate, using certified seeds appropriate for your altitude. Space rows 75cm apart with 30cm between plants for optimal yields.";
     }
-    
-    if (input.includes("weather") || input.includes("rain")) {
-      return "Current weather in Nakuru: Expect short rains October-December. Long rains March-May. Use this time for land preparation. Check Kenya Met Department for weekly forecasts. Consider drought-resistant varieties if rains are uncertain.";
+    else {
+      return "Thank you for your question. Based on farming practices in Nakuru County, I recommend integrating crop rotation with legumes like beans to improve soil fertility. Would you like more specific information about particular crops or farming techniques?";
     }
-    
-    if (input.includes("fertilizer")) {
-      return "For Nakuru soils: Test your soil pH first. Most crops need DAP at planting, CAN for top-dressing. Organic options: well-rotted manure, compost. Visit nearest agrovets in Nakuru town for quality fertilizers. Apply during rainy season for best results.";
-    }
-    
-    return "I can help with crop advice for Nakuru farmers. Ask me about maize, beans, potatoes, weather, fertilizers, pest control, or market prices. For specific advice, tell me your crop type and current growth stage.";
   };
 
-  const quickQuestions = [
-    "When should I plant maize?",
-    "Best fertilizer for beans?",
-    "Potato disease prevention",
-    "Current market prices"
-  ];
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      <Card className="h-[calc(100vh-200px)] sm:h-[600px] flex flex-col bg-white/90 backdrop-blur-sm shadow-lg">
-        <CardHeader className="bg-green-600 text-white p-3 sm:p-6 flex-shrink-0">
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Bot className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            <span className="truncate">Smart Crop Assistant</span>
-          </CardTitle>
-          <p className="text-green-100 text-xs sm:text-sm">
-            Get personalized farming advice for Nakuru County
-          </p>
-        </CardHeader>
-        
-        <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-          <ScrollArea className="flex-1 p-2 sm:p-4 overflow-hidden">
-            <div className="space-y-3 sm:space-y-4 pb-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex items-start gap-2 ${
-                    message.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {message.sender === "bot" && (
-                    <div className="bg-green-600 p-1.5 sm:p-2 rounded-full flex-shrink-0">
-                      <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                    </div>
+  const suggestedQuestions = [
                   )}
                   
                   <div
