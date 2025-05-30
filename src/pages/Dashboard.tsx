@@ -248,7 +248,7 @@ const Dashboard = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/dashboard/help?tab=tutorials")}>
                     <BookOpen className="w-4 h-4 mr-2" />
-                    <span>View Tutorial</span>
+                    <span>View Tutorials</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/dashboard/help?tab=support")}>
                     <PhoneCall className="w-4 h-4 mr-2" />
@@ -409,8 +409,8 @@ const Dashboard = () => {
                 Help & Resources
               </p>
               {[
-                { label: "View Tutorial", icon: BookOpen, path: "/tutorial" },
-                { label: "Contact Support", icon: PhoneCall, path: "/support" },
+                { label: "View Tutorials", icon: BookOpen, path: "/dashboard/help?tab=tutorials" },
+                { label: "Contact Support", icon: PhoneCall, path: "/dashboard/help?tab=support" },
               ].map((item) => (
                 <button
                   key={item.label}

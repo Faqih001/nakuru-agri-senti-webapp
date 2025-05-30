@@ -22,7 +22,7 @@ export const Help = () => {
         <p className="text-gray-500 mt-2">Get help with AgriSenti dashboard and features</p>
       </div>
 
-      <Tabs defaultValue="tutorials" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 mb-6">
           <TabsTrigger value="tutorials" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
