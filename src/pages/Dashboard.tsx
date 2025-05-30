@@ -723,28 +723,32 @@ const Dashboard = () => {
       <div className="lg:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-40 shadow-lg">
         <div className="grid grid-cols-5 gap-1">
           {[
-            { icon: BarChart, label: "Overview", active: true },
-            { icon: Sprout, label: "Crops", active: false },
-            { icon: Camera, label: "Detect", active: false },
-            { icon: TrendingUp, label: "Market", active: false },
-            { icon: User, label: "Profile", active: false, onClick: () => setSidebarOpen(true) },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={item.onClick}
-              className={cn(
-                "flex flex-col items-center py-3 px-1 transition-colors",
-                item.active 
-                  ? "text-green-600 relative" 
-                  : "text-gray-500 hover:text-gray-700 active:bg-gray-50"
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-xs mt-1">{item.label}</span>
-              {item.active && (
-                <span className="absolute bottom-0 w-10 h-0.5 bg-green-600 rounded-t-full"></span>
-              )}
-            </button>
+            { icon: BarChart, label: "Overview", path: "/dashboard" },
+            { icon: Sprout, label: "Crops", path: "/dashboard/crop-assistant" },
+            { icon: Camera, label: "Detect", path: "/dashboard/disease-detection" },
+            { icon: TrendingUp, label: "Market", path: "/dashboard/market" },
+            { icon: User, label: "Settings", path: "/dashboard/settings" },
+          ].map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.label}
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  "flex flex-col items-center py-3 px-1 transition-colors",
+                  isActive 
+                    ? "text-green-600 relative" 
+                    : "text-gray-500 hover:text-gray-700 active:bg-gray-50"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="text-xs mt-1">{item.label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 w-10 h-0.5 bg-green-600 rounded-t-full"></span>
+                )}
+              </button>
+            );
+          })}
           ))}
         </div>
       </div>
