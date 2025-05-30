@@ -37,13 +37,17 @@ export const Header = () => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Get help with AgriSenti dashboard and features</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <BookOpen className="w-4 h-4 mr-2" />
-                <span>View Tutorial</span>
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Link to="/dashboard/help?tab=tutorials">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span>View Tutorial</span>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <PhoneCall className="w-4 h-4 mr-2" />
-                <span>Contact Support</span>
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Link to="/dashboard/help?tab=support">
+                  <PhoneCall className="w-4 h-4 mr-2" />
+                  <span>Contact Support</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -16,6 +16,7 @@ import { DiseaseDetection } from "@/components/DiseaseDetection";
 import { MarketDashboard } from "@/components/MarketDashboard";
 import { WeatherDashboard } from "@/pages/WeatherDashboard";
 import { Settings } from "@/pages/Settings";
+import Help from "@/pages/Help";
 import FeatureDetail from "./pages/FeatureDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="weather" element={<WeatherDashboard />} />
               <Route path="market" element={<MarketDashboard />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="help" element={<Help />} />
             </Route>
 
             {/* Catch-all route */}

@@ -246,11 +246,11 @@ const Dashboard = () => {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Get help with AgriSenti dashboard and features</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/dashboard/help?tab=tutorials")}>
                     <BookOpen className="w-4 h-4 mr-2" />
                     <span>View Tutorial</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/dashboard/help?tab=support")}>
                     <PhoneCall className="w-4 h-4 mr-2" />
                     <span>Contact Support</span>
                   </DropdownMenuItem>
@@ -349,6 +349,7 @@ const Dashboard = () => {
                 { label: "Disease Detection", icon: Camera, path: "/dashboard/disease-detection", active: location.pathname === "/dashboard/disease-detection" },
                 { label: "Weather", icon: Cloud, path: "/dashboard/weather", active: location.pathname === "/dashboard/weather" },
                 { label: "Market", icon: TrendingUp, path: "/dashboard/market", active: location.pathname === "/dashboard/market" },
+                { label: "Help & Resources", icon: HelpCircle, path: "/dashboard/help", active: location.pathname === "/dashboard/help" },
               ].map((item) => (
                 <button
                   key={item.label}
@@ -500,7 +501,7 @@ const Dashboard = () => {
             { icon: Sprout, label: "Crops", path: "/dashboard/crop-assistant" },
             { icon: Camera, label: "Detect", path: "/dashboard/disease-detection" },
             { icon: TrendingUp, label: "Market", path: "/dashboard/market" },
-            { icon: User, label: "Settings", path: "/dashboard/settings" },
+            { icon: HelpCircle, label: "Help", path: "/dashboard/help" },
           ].map((item) => {
             const isActive = location.pathname === item.path;
             return (
