@@ -465,24 +465,26 @@ const Dashboard = () => {
         <main className="flex-1 px-3 sm:px-4 py-4 sm:py-6 lg:py-8 overflow-auto pb-24 lg:pb-8">
           <div className="container mx-auto max-w-6xl space-y-6">
             {/* Page title and location */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
-                <div className="flex items-center text-gray-500 mt-1">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  <span className="text-sm">Nakuru County, Kenya</span>
+            {location.pathname === "/dashboard" ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+                  <div className="flex items-center text-gray-500 mt-1">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    <span className="text-sm">Nakuru County, Kenya</span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" className="border-green-200 text-green-700">
+                    <RefreshCw className="w-4 h-4 mr-1.5" /> Refresh Data
+                  </Button>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Sprout className="w-4 h-4 mr-1.5" /> New Season
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" className="border-green-200 text-green-700">
-                  <RefreshCw className="w-4 h-4 mr-1.5" /> Refresh Data
-                </Button>
-                <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                  <Sprout className="w-4 h-4 mr-1.5" /> New Season
-                </Button>
-              </div>
-            </div>
+            ) : null}
 
             <Outlet />
             
