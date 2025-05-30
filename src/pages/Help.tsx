@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, PhoneCall, HelpCircle, MessageCircle, Video, FileText, ExternalLink } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 export const Help = () => {
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("tutorials");
+  
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "tutorials" || tab === "support") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
   return (
     <div className="container mx-auto max-w-4xl space-y-6">
       <div>
