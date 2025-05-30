@@ -127,23 +127,25 @@ const Dashboard = () => {
     {
       title: "Add New Crop",
       description: "Register a new crop for monitoring",
-      icon: <Sprout className="w-12 h-12 text-green-600" />,
+      icon: Sprout,
       buttonText: "Add Crop",
       buttonColor: "bg-green-600 hover:bg-green-700",
-      cardColor: "from-green-100 to-emerald-100 border-green-200"
+      cardColor: "from-green-100 to-emerald-100 border-green-200",
+      path: "/dashboard/crop-assistant"
     },
     {
       title: "Quick Scan",
       description: "Scan for diseases instantly",
-      icon: <Camera className="w-12 h-12 text-blue-600" />,
+      icon: Camera,
       buttonText: "Start Scan",
       buttonColor: "bg-blue-600 hover:bg-blue-700",
-      cardColor: "from-blue-100 to-cyan-100 border-blue-200"
+      cardColor: "from-blue-100 to-cyan-100 border-blue-200",
+      path: "/dashboard/disease-detection"
     },
     {
       title: "Market Alert",
       description: "Set price alerts for your crops",
-      icon: <TrendingUp className="w-12 h-12 text-orange-600" />,
+      icon: TrendingUp,
       buttonText: "Set Alert",
       buttonColor: "bg-orange-600 hover:bg-orange-700",
       cardColor: "from-orange-100 to-red-100 border-orange-200"
