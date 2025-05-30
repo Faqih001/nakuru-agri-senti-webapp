@@ -99,7 +99,7 @@ export const DashboardLayout = () => {
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200",
-          "transition-all duration-300 ease-in-out",
+          "transition-all duration-300 ease-in-out flex flex-col",
           isMobile ? (
             isSidebarOpen 
               ? "translate-x-0 shadow-xl w-72" 
@@ -111,86 +111,86 @@ export const DashboardLayout = () => {
           )
         )}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="h-16 flex items-center justify-between px-4 border-b">
-            <div className="flex items-center space-x-3">
-              <div className="bg-green-600 p-2 rounded-lg">
-                <Sprout className="w-5 h-5 text-white" />
-              </div>
-              {(isSidebarOpen || isMobile) && (
-                <span className="text-xl font-semibold text-gray-800">
-                  AgriSenti
-                </span>
-              )}
+        {/* Sidebar Header */}
+        <div className="h-16 flex items-center justify-between px-4 border-b flex-shrink-0">
+          <div className="flex items-center space-x-3">
+            <div className="bg-green-600 p-2 rounded-lg">
+              <Sprout className="w-5 h-5 text-white" />
             </div>
-            
-            {/* Mobile close button */}
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            )}
-            
-            {/* Desktop toggle button */}
-            {!isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                onClick={toggleSidebar}
-              >
-                <PanelLeft className={cn(
-                  "h-5 w-5 transition-transform duration-300",
-                  !isSidebarOpen && "rotate-180"
-                )} />
-              </Button>
+            {(isSidebarOpen || isMobile) && (
+              <span className="text-xl font-semibold text-gray-800">
+                AgriSenti
+              </span>
             )}
           </div>
+          
+          {/* Mobile close button */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {/* Desktop toggle button */}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              onClick={toggleSidebar}
+            >
+              <PanelLeft className={cn(
+                "h-5 w-5 transition-transform duration-300",
+                !isSidebarOpen && "rotate-180"
+              )} />
+            </Button>
+          )}
+        </div>
 
-          {/* Sidebar Content */}
-          <div className="flex-1 py-4 overflow-y-auto">
-            <nav className="space-y-1 px-3">
-              {sidebarItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === "/dashboard"}
-                  onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                      isActive
-                        ? "text-green-600 bg-green-50"
-                        : "text-gray-600 hover:text-green-600 hover:bg-green-50",
-                      !isSidebarOpen && !isMobile && "justify-center px-2"
-                    )
-                  }
-                >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  {(isSidebarOpen || isMobile) && <span className="ml-3">{item.label}</span>}
-                </NavLink>
-              ))}
-
-              {/* Logout Button */}
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full mt-4 text-red-600 hover:text-red-700 hover:bg-red-50",
-                  !isSidebarOpen && !isMobile && "px-2 justify-center"
-                )}
-                onClick={handleSignOut}
+        {/* Navigation Items - with overflow scrolling */}
+        <div className="flex-1 py-4 overflow-y-auto">
+          <nav className="space-y-1 px-3">
+            {sidebarItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === "/dashboard"}
+                onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive
+                      ? "text-green-600 bg-green-50"
+                      : "text-gray-600 hover:text-green-600 hover:bg-green-50",
+                    !isSidebarOpen && !isMobile && "justify-center px-2"
+                  )
+                }
               >
-                <LogOut className="w-5 h-5 flex-shrink-0" />
-                {(isSidebarOpen || isMobile) && <span className="ml-3">Logout</span>}
-              </Button>
-            </nav>
-          </div>
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {(isSidebarOpen || isMobile) && <span className="ml-3">{item.label}</span>}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+        
+        {/* Logout Button - positioned at the bottom */}
+        <div className="px-3 py-4 border-t border-gray-200 mt-auto">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full text-red-600 hover:text-red-700 hover:bg-red-50",
+              !isSidebarOpen && !isMobile && "px-2 justify-center"
+            )}
+            onClick={handleSignOut}
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {(isSidebarOpen || isMobile) && <span className="ml-3">Logout</span>}
+          </Button>
         </div>
       </aside>
 
