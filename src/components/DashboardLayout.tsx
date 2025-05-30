@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Outlet, useNavigate, NavLink } from "react-router-dom";
@@ -18,6 +18,7 @@ import {
   HelpCircle,
   Mail,
   Layout as LayoutIcon,
+  PanelLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +40,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 
 // Sidebar Navigation Items
@@ -52,10 +54,20 @@ const sidebarItems = [
 ];
 
 export const DashboardLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Update sidebar state when screen size changes
+  useEffect(() => {
+    setIsSidebarOpen(!isMobile);
+  }, [isMobile]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -66,13 +78,29 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Backdrop overlay for mobile when sidebar is open */}
+      {isMobile && isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ease-in-out"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-screen transition-transform bg-white border-r border-gray-200",
-          isSidebarOpen ? "w-64" : "w-16",
-          "md:translate-x-0",
-          !isSidebarOpen && "-translate-x-full md:translate-x-0"
+          "fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200",
+          "transition-all duration-300 ease-in-out",
+          isMobile ? (
+            isSidebarOpen 
+              ? "translate-x-0 shadow-xl w-72" 
+              : "-translate-x-full"
+          ) : (
+            isSidebarOpen
+              ? "translate-x-0 w-64"
+              : "translate-x-0 w-16"
+          )
         )}
       >
         <div className="flex flex-col h-full">
@@ -82,12 +110,39 @@ export const DashboardLayout = () => {
               <div className="bg-green-600 p-2 rounded-lg">
                 <Sprout className="w-5 h-5 text-white" />
               </div>
-              {isSidebarOpen && (
+              {(isSidebarOpen || isMobile) && (
                 <span className="text-xl font-semibold text-gray-800">
                   AgriSenti
                 </span>
               )}
             </div>
+            
+            {/* Mobile close button */}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            )}
+            
+            {/* Desktop toggle button */}
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                onClick={toggleSidebar}
+              >
+                <PanelLeft className={cn(
+                  "h-5 w-5 transition-transform duration-300",
+                  !isSidebarOpen && "rotate-180"
+                )} />
+              </Button>
+            )}
           </div>
 
           {/* Sidebar Content */}
@@ -98,18 +153,19 @@ export const DashboardLayout = () => {
                   key={item.path}
                   to={item.path}
                   end={item.path === "/dashboard"}
+                  onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                       isActive
                         ? "text-green-600 bg-green-50"
                         : "text-gray-600 hover:text-green-600 hover:bg-green-50",
-                      !isSidebarOpen && "justify-center px-2"
+                      !isSidebarOpen && !isMobile && "justify-center px-2"
                     )
                   }
                 >
                   <item.icon className="w-5 h-5 flex-shrink-0" />
-                  {isSidebarOpen && <span className="ml-3">{item.label}</span>}
+                  {(isSidebarOpen || isMobile) && <span className="ml-3">{item.label}</span>}
                 </NavLink>
               ))}
 
@@ -118,12 +174,12 @@ export const DashboardLayout = () => {
                 variant="ghost"
                 className={cn(
                   "w-full mt-4 text-red-600 hover:text-red-700 hover:bg-red-50",
-                  !isSidebarOpen && "px-2 justify-center"
+                  !isSidebarOpen && !isMobile && "px-2 justify-center"
                 )}
                 onClick={handleSignOut}
               >
                 <LogOut className="w-5 h-5 flex-shrink-0" />
-                {isSidebarOpen && <span className="ml-3">Logout</span>}
+                {(isSidebarOpen || isMobile) && <span className="ml-3">Logout</span>}
               </Button>
             </nav>
           </div>
@@ -134,24 +190,28 @@ export const DashboardLayout = () => {
       <div
         className={cn(
           "transition-all duration-300",
-          isSidebarOpen ? "md:ml-64" : "md:ml-16"
+          isMobile ? "" : (isSidebarOpen ? "md:ml-64" : "md:ml-16")
         )}
       >
         {/* Top Navigation */}
-        <header className="h-16 bg-white border-b border-gray-200 fixed right-0 top-0 left-0 z-30 md:left-64">
+        <header 
+          className={cn(
+            "h-16 bg-white border-b border-gray-200 fixed right-0 top-0 left-0 z-30",
+            !isMobile && (isSidebarOpen ? "md:left-64" : "md:left-16"),
+            "transition-all duration-300"
+          )}
+        >
           <div className="flex items-center justify-between h-full px-4">
             <div className="flex items-center space-x-4">
+              {/* Mobile sidebar toggle button */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="md:hidden"
+                onClick={toggleSidebar}
+                className="md:hidden flex items-center justify-center"
+                aria-label="Toggle sidebar"
               >
-                {isSidebarOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
+                <Menu className="w-5 h-5" />
               </Button>
 
               {/* Desktop Search */}
@@ -341,6 +401,18 @@ export const DashboardLayout = () => {
             <Outlet />
           </div>
         </main>
+
+        {/* Mobile floating action button to open sidebar when closed */}
+        {isMobile && !isSidebarOpen && (
+          <Button
+            onClick={toggleSidebar}
+            className="fixed bottom-6 left-6 z-20 h-12 w-12 rounded-full bg-green-600 hover:bg-green-700 shadow-lg flex items-center justify-center"
+            size="icon"
+            aria-label="Open sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
       </div>
     </div>
   );
