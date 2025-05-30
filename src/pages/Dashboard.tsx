@@ -38,7 +38,6 @@ import {
   PhoneCall
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -48,7 +47,6 @@ const Dashboard = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("assistant");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isMobile = useIsMobile();
   
   // Weather data - would be fetched from an API in a real app
   const weatherData = {
