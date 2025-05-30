@@ -205,11 +205,12 @@ const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-green-50 hover:text-green-600"
+                className="hover:bg-green-50 hover:text-green-600 relative"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle sidebar menu"
               >
                 <Menu className="h-5 w-5" />
+                <span className="lg:hidden absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
               </Button>
               
               <div className="flex items-center gap-3">
