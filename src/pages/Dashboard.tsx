@@ -558,26 +558,30 @@ const Dashboard = () => {
                     <ChevronRight className="h-5 w-5 ml-1 text-green-600" />
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {quickActions.map((action, index) => (
-                      <Card 
-                        key={index}
-                        className={cn(
-                          "bg-gradient-to-br border hover:shadow-lg transition-shadow",
-                          action.cardColor
-                        )}
-                      >
-                        <CardContent className="p-4 sm:p-6 text-center">
-                          <div className="inline-flex p-3 rounded-full bg-white/50 mb-4">
-                            {action.icon}
-                          </div>
-                          <h3 className="font-semibold text-gray-800 mb-1">{action.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4">{action.description}</p>
-                          <Button className={cn("w-full", action.buttonColor)}>
-                            {action.buttonText}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {quickActions.map((action, index) => {
+                      const Icon = action.icon;
+                      return (
+                        <Card 
+                          key={index}
+                          className={cn(
+                            "bg-gradient-to-br border hover:shadow-lg transition-shadow cursor-pointer",
+                            action.cardColor
+                          )}
+                          onClick={() => navigate(action.path)}
+                        >
+                          <CardContent className="p-4 sm:p-6 text-center">
+                            <div className="inline-flex p-3 rounded-full bg-white/50 mb-4">
+                              <Icon className="w-12 h-12 text-green-600" />
+                            </div>
+                            <h3 className="font-semibold text-gray-800 mb-1">{action.title}</h3>
+                            <p className="text-sm text-gray-600 mb-4">{action.description}</p>
+                            <Button className={cn("w-full", action.buttonColor)}>
+                              {action.buttonText}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
