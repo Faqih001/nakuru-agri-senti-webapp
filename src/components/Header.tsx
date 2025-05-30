@@ -40,7 +40,7 @@ export const Header = () => {
               <DropdownMenuItem className="cursor-pointer" asChild>
                 <Link to="/dashboard/help?tab=tutorials">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  <span>View Tutorial</span>
+                  <span>View Tutorials</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" asChild>
