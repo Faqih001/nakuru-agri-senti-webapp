@@ -178,13 +178,13 @@ export const DashboardLayout = () => {
           </nav>
         </div>
         
-        {/* Logout Button - positioned at the bottom */}
+        {/* Logout Button - positioned at the bottom and left aligned */}
         <div className="px-3 py-4 border-t border-gray-200 mt-auto">
           <Button
             variant="ghost"
             className={cn(
-              "w-full text-red-600 hover:text-red-700 hover:bg-red-50",
-              !isSidebarOpen && !isMobile && "px-2 justify-center"
+              "w-full text-red-600 hover:text-red-700 hover:bg-red-50 justify-start",
+              !isSidebarOpen && !isMobile && "px-2"
             )}
             onClick={handleSignOut}
           >
