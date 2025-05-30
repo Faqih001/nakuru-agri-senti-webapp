@@ -692,17 +692,21 @@ const Dashboard = () => {
                     <ChevronRight className="h-5 w-5 ml-1 text-green-600" />
                   </h2>
                   <div className="space-y-2">
-                    {quickActions.map((action, index) => (
-                      <Button 
-                        key={index} 
-                        className={`w-full justify-start gap-3 text-left ${action.buttonColor}`}
-                      >
-                        <div className="bg-white/20 p-1.5 rounded-md">
-                          {React.cloneElement(action.icon, { className: "w-5 h-5" })}
-                        </div>
-                        <span>{action.title}</span>
-                      </Button>
-                    ))}
+                    {quickActions.map((action, index) => {
+                      const Icon = action.icon;
+                      return (
+                        <Button 
+                          key={index} 
+                          className={`w-full justify-start gap-3 text-left ${action.buttonColor}`}
+                          onClick={() => navigate(action.path)}
+                        >
+                          <div className="bg-white/20 p-1.5 rounded-md">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <span>{action.title}</span>
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
