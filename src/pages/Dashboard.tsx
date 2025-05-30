@@ -148,7 +148,8 @@ const Dashboard = () => {
       icon: TrendingUp,
       buttonText: "Set Alert",
       buttonColor: "bg-orange-600 hover:bg-orange-700",
-      cardColor: "from-orange-100 to-red-100 border-orange-200"
+      cardColor: "from-orange-100 to-red-100 border-orange-200",
+      path: "/dashboard/market"
     }
   ];
 
