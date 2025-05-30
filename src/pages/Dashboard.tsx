@@ -299,7 +299,7 @@ const Dashboard = () => {
         {/* Sidebar - Hidden on mobile, shown as overlay */}
         <aside 
           className={cn(
-            "bg-white border-r border-gray-100 w-72 fixed inset-y-0 pt-16 left-0 z-50 transition-all duration-300 ease-in-out transform lg:relative lg:translate-x-0 lg:pt-0 lg:w-64",
+            "bg-white border-r border-gray-100 w-80 fixed inset-y-0 pt-16 left-0 z-50 transition-all duration-300 ease-in-out transform lg:relative lg:translate-x-0 lg:pt-0 lg:w-64",
             sidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
           )}
         >
@@ -353,7 +353,7 @@ const Dashboard = () => {
                 <button
                   key={item.label}
                   className={cn(
-                    "flex items-center gap-3 w-full px-4 py-3 md:py-2.5 rounded-lg transition-all",
+                    "flex items-center gap-3 w-full px-4 py-3.5 lg:py-2.5 rounded-lg transition-all",
                     item.active
                       ? "bg-gradient-to-r from-green-50 to-green-100 text-green-800 shadow-sm"
                       : "hover:bg-gray-50 text-gray-700"
@@ -413,7 +413,7 @@ const Dashboard = () => {
               ].map((item) => (
                 <button
                   key={item.label}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition-all hover:bg-gray-50 text-gray-700"
+                  className="flex items-center gap-3 w-full px-4 py-3.5 lg:py-2.5 rounded-lg transition-all hover:bg-gray-50 text-gray-700"
                   onClick={() => {
                     navigate(item.path);
                     setSidebarOpen(false);
@@ -460,6 +460,20 @@ const Dashboard = () => {
           onClick={() => setSidebarOpen(false)} 
           aria-hidden="true"
         />
+        
+        {/* Mobile menu button reminder - only visible when sidebar is closed */}
+        <div 
+          className={cn(
+            "fixed top-16 left-3 z-30 bg-white p-2 rounded-full shadow-lg border border-green-100 lg:hidden transition-opacity duration-300",
+            sidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}
+          onClick={() => setSidebarOpen(true)}
+        >
+          <div className="flex items-center gap-2 px-3 py-1.5">
+            <Menu className="h-4 w-4 text-green-600" />
+            <span className="text-xs font-medium text-green-600">Menu</span>
+          </div>
+        </div>
         
         {/* Main content */}
         <main className="flex-1 px-3 sm:px-4 py-4 sm:py-6 lg:py-8 overflow-auto pb-8">
