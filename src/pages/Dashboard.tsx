@@ -205,12 +205,12 @@ const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-green-50 hover:text-green-600 relative"
+                className="lg:hover:bg-green-50 lg:hover:text-green-600 relative lg:bg-transparent bg-green-50 lg:text-inherit text-green-600"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle sidebar menu"
               >
                 <Menu className="h-5 w-5" />
-                <span className="lg:hidden absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="lg:hidden absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               </Button>
               
               <div className="flex items-center gap-3">
@@ -303,14 +303,20 @@ const Dashboard = () => {
             sidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
           )}
         >
-          <div className="sticky top-0 p-4 space-y-6 h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <div className="sticky top-0 p-4 pb-16 space-y-6 h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-green-200 scrollbar-track-transparent">
             {/* Close button - mobile only */}
-            <div className="lg:hidden flex justify-end">
+            <div className="lg:hidden flex justify-between items-center border-b border-gray-100 pb-3 mb-2">
+              <div className="flex items-center gap-2">
+                <div className="bg-green-100 p-1.5 rounded-md">
+                  <Menu className="w-4 h-4 text-green-600" />
+                </div>
+                <span className="text-sm font-medium text-green-700">Navigation Menu</span>
+              </div>
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => setSidebarOpen(false)}
-                className="text-gray-500 hover:bg-green-50 hover:text-green-600 absolute top-2 right-2"
+                className="text-gray-500 hover:bg-green-50 hover:text-green-600"
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -364,7 +370,7 @@ const Dashboard = () => {
                   }}
                 >
                   <div className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-md",
+                    "flex items-center justify-center w-8 h-8 sm:w-8 sm:h-8 rounded-md",
                     item.active ? "bg-green-100" : "bg-gray-100"
                   )}>
                     <item.icon className={cn("w-5 h-5", item.active ? "text-green-600" : "text-gray-500")} />
@@ -384,7 +390,7 @@ const Dashboard = () => {
                 <button
                   key={item.label}
                   className={cn(
-                    "flex items-center gap-3 w-full px-4 py-3 md:py-2.5 rounded-lg transition-all",
+                    "flex items-center gap-3 w-full px-4 py-3.5 lg:py-2.5 rounded-lg transition-all",
                     item.active
                       ? "bg-gradient-to-r from-green-50 to-green-100 text-green-800"
                       : "hover:bg-gray-50 text-gray-700"
@@ -461,18 +467,16 @@ const Dashboard = () => {
           aria-hidden="true"
         />
         
-        {/* Mobile menu button reminder - only visible when sidebar is closed */}
+        {/* Mobile floating action button - only visible when sidebar is closed */}
         <div 
           className={cn(
-            "fixed top-16 left-3 z-30 bg-white p-2 rounded-full shadow-lg border border-green-100 lg:hidden transition-opacity duration-300",
-            sidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+            "fixed bottom-6 right-6 z-30 bg-green-600 p-3 rounded-full shadow-xl lg:hidden transition-all duration-300",
+            sidebarOpen ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100 hover:bg-green-700"
           )}
           onClick={() => setSidebarOpen(true)}
         >
-          <div className="flex items-center gap-2 px-3 py-1.5">
-            <Menu className="h-4 w-4 text-green-600" />
-            <span className="text-xs font-medium text-green-600">Menu</span>
-          </div>
+          <Menu className="h-6 w-6 text-white" />
+          <span className="sr-only">Open navigation menu</span>
         </div>
         
         {/* Main content */}
