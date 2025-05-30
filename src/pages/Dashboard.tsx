@@ -379,7 +379,10 @@ const Dashboard = () => {
                     <Badge className="bg-white/20 text-white">AI Features</Badge>
                   </div>
                   <p className="text-xs text-green-100">Get advanced analytics, AI predictions, and market insights.</p>
-                  <Button className="w-full bg-white text-green-800 hover:bg-green-50 font-medium shadow-md">
+                  <Button 
+                    className="w-full bg-white text-green-800 hover:bg-green-50 font-medium shadow-md"
+                    onClick={() => window.open('https://agrisenti.com/pricing', '_blank')}
+                  >
                     Upgrade Now
                   </Button>
                 </CardContent>
@@ -505,6 +508,7 @@ const Dashboard = () => {
                           <TabsList className="bg-transparent h-auto p-0 flex w-full overflow-x-auto no-scrollbar">
                             <TabsTrigger 
                               value="assistant" 
+                              onClick={() => navigate("/dashboard/crop-assistant")}
                               className="flex-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-green-600 data-[state=active]:text-green-700 rounded-none py-3 px-6 text-gray-600"
                             >
                               <div className="flex items-center gap-2">
@@ -514,7 +518,8 @@ const Dashboard = () => {
                               <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">NEW</Badge>
                             </TabsTrigger>
                             <TabsTrigger 
-                              value="detection" 
+                              value="detection"
+                              onClick={() => navigate("/dashboard/disease-detection")}
                               className="flex-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-green-600 data-[state=active]:text-green-700 rounded-none py-3 px-6 text-gray-600"
                             >
                               <div className="flex items-center gap-2">
@@ -523,7 +528,8 @@ const Dashboard = () => {
                               </div>
                             </TabsTrigger>
                             <TabsTrigger 
-                              value="market" 
+                              value="market"
+                              onClick={() => navigate("/dashboard/market")} 
                               className="flex-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-green-600 data-[state=active]:text-green-700 rounded-none py-3 px-6 text-gray-600"
                             >
                               <div className="flex items-center gap-2">
@@ -575,10 +581,12 @@ const Dashboard = () => {
                               <Icon className="w-12 h-12 text-green-600" />
                             </div>
                             <h3 className="font-semibold text-gray-800 mb-1">{action.title}</h3>
-                            <p className="text-sm text-gray-600 mb-4">{action.description}</p>
-                            <Button className={cn("w-full", action.buttonColor)}>
-                              {action.buttonText}
-                            </Button>
+                            <p className="text-sm text-gray-600 mb-4">{action.description}</p>                          <Button 
+                            className={cn("w-full", action.buttonColor)}
+                            onClick={() => navigate(action.path)}
+                          >
+                            {action.buttonText}
+                          </Button>
                           </CardContent>
                         </Card>
                       );
@@ -651,7 +659,10 @@ const Dashboard = () => {
                         </div>
                       ))}
                     </div>
-                    <Button className="mt-4 w-full bg-purple-600 hover:bg-purple-700">
+                    <Button 
+                      className="mt-4 w-full bg-purple-600 hover:bg-purple-700"
+                      onClick={() => navigate("/dashboard/crop-assistant")}
+                    >
                       See Full Analysis
                     </Button>
                   </CardContent>

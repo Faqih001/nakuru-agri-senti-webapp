@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Outlet, useNavigate, NavLink } from "react-router-dom";
+import { Outlet, useNavigate, NavLink, useLocation } from "react-router-dom";
 import {
   Sprout,
   Menu,
@@ -60,10 +60,18 @@ export const DashboardLayout = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // Update sidebar state when screen size changes
+  // Update sidebar state when screen size changes or during navigation
   useEffect(() => {
     setIsSidebarOpen(!isMobile);
   }, [isMobile]);
+
+  // Close sidebar on navigation when on mobile
+  const location = useLocation();
+  useEffect(() => {
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prev => !prev);
