@@ -86,6 +86,64 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Top Header - Full width */}
+      <header className="h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+        <div className="flex items-center justify-between h-full px-4">
+          <div className="flex items-center space-x-4">
+            {/* Mobile menu button */}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSidebar}
+                className="flex items-center justify-center"
+                aria-label="Toggle sidebar"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            )}
+
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 p-2.5 rounded-lg shadow-md">
+                <Sprout className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-green-800 tracking-tight">AgriSenti</h1>
+                <p className="text-xs text-green-600 hidden sm:block">Smart Farming Platform</p>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="hidden md:flex items-center space-x-4 w-96 ml-4">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search anything..."
+                  className="pl-10 bg-gray-50 border-gray-200 w-full focus:ring-green-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <Button variant="ghost" size="sm" className="relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium flex items-center justify-center text-white">3</span>
+            </Button>
+
+            {/* User Avatar */}
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>{userInitials}</AvatarFallback>
+              </Avatar>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
       {/* Backdrop overlay for mobile when sidebar is open */}
       {isMobile && isSidebarOpen && (
         <div 
@@ -95,29 +153,19 @@ export const DashboardLayout = () => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Now starts below the header */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200",
+          "fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] bg-white border-r border-gray-200",
           "transition-all duration-300 ease-in-out flex flex-col",
           isMobile 
             ? (isSidebarOpen ? "translate-x-0 shadow-xl w-72" : "-translate-x-full")
             : "w-64 translate-x-0"
         )}
       >
-        {/* Logo Section - Always visible on desktop */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-100">
-          <div className="flex items-center gap-3 flex-1">
-            <div className="bg-gradient-to-br from-green-500 to-green-600 p-2.5 rounded-lg shadow-md">
-              <Sprout className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-green-800 tracking-tight">AgriSenti</h1>
-              <p className="text-xs text-green-600">Smart Farming Platform</p>
-            </div>
-          </div>
-          {/* Mobile close button */}
-          {isMobile && (
+        {/* Mobile close button - only on mobile */}
+        {isMobile && (
+          <div className="h-12 flex items-center px-4 border-b border-gray-100 justify-end">
             <Button
               variant="ghost"
               size="icon"
@@ -126,8 +174,8 @@ export const DashboardLayout = () => {
             >
               <X className="h-5 w-5" />
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* User Profile Section */}
         <div className="p-4 border-b border-gray-100">
@@ -184,58 +232,12 @@ export const DashboardLayout = () => {
 
       {/* Main Content */}
       <div className={cn(
-        "transition-all duration-300",
+        "transition-all duration-300 pt-16", // Added pt-16 to account for the fixed header
         isMobile ? "" : "ml-64"
       )}>
-        {/* Top Navigation */}
-        <header className="h-16 bg-white border-b border-gray-200 fixed right-0 top-0 left-0 z-30 pl-64">
-          <div className="flex items-center justify-between h-full px-4">
-            <div className="flex items-center space-x-4">
-              {/* Mobile menu button */}
-              {isMobile && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleSidebar}
-                  className="flex items-center justify-center"
-                  aria-label="Toggle sidebar"
-                >
-                  <Menu className="w-5 h-5" />
-                </Button>
-              )}
-
-              {/* Search Bar */}
-              <div className="hidden md:flex items-center space-x-4 w-96">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search anything..."
-                    className="pl-10 bg-gray-50 border-gray-200 w-full focus:ring-green-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium flex items-center justify-center text-white">3</span>
-              </Button>
-
-              {/* User Avatar */}
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{userInitials}</AvatarFallback>
-                </Avatar>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </header>
 
         {/* Page Content */}
-        <main className="pt-16 min-h-screen pl-5">
+        <main className="min-h-screen">
           <div className="p-6">
             <Outlet />
           </div>
