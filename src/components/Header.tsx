@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sprout, Bell, User, HelpCircle, BookOpen, PhoneCall, Settings, LogOut } from "lucide-react";
+import { Sprout, Bell, User, HelpCircle, BookOpen, PhoneCall, Settings, LogOut, Menu } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,20 +9,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 export const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50">
       <div className="container mx-auto px-4 lg:px-6 py-3 lg:py-4 flex items-center justify-between">
-        <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-          <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 lg:p-2.5 rounded-lg shadow-md">
-            <Sprout className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="font-bold text-green-800 text-base lg:text-lg tracking-tight">AgriSenti</h2>
-            <p className="text-xs lg:text-sm text-green-600 hidden sm:block">Dashboard</p>
-          </div>
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Mobile menu toggle - only visible on small screens */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="lg:hidden text-green-700 hover:text-green-800 hover:bg-green-50 p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+
+          {/* Logo - now at the start */}
+          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 lg:p-2.5 rounded-lg shadow-md">
+              <Sprout className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="font-bold text-green-800 text-base lg:text-lg tracking-tight">AgriSenti</h2>
+              <p className="text-xs lg:text-sm text-green-600 hidden sm:block">Smart Farming Platform</p>
+            </div>
+          </Link>
+        </div>
         
         <div className="flex items-center gap-2 lg:gap-4">
           {/* Help & Resources Dropdown */}
