@@ -109,9 +109,8 @@ const SidebarProvider = React.forwardRef<
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
-            className={cn("sidebar-wrapper", className)}
+            className={cn(styles.sidebarContainer, styles.wrapper, className)}
             ref={ref}
-            style={style}
             {...props}
           >
             {children}
