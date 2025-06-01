@@ -198,7 +198,7 @@ export const Help = () => {
             <CardContent className="space-y-4">
               <div className="p-3 border border-gray-200 rounded-lg">
                 <h3 className="font-medium">How do I update my farm location?</h3>
-                <p className="text-sm text-gray-600 mt-2">Go to Settings > Farm Profile > Location and use the map to pinpoint your location.</p>
+                <p className="text-sm text-gray-600 mt-2">Go to Settings &gt; Farm Profile &gt; Location and use the map to pinpoint your location.</p>
               </div>
               <div className="p-3 border border-gray-200 rounded-lg">
                 <h3 className="font-medium">Why can't I see weather data?</h3>
