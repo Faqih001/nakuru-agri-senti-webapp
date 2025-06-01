@@ -1,0 +1,21 @@
+/* Mobile sidebar styles */
+.sidebarMobile {
+  --sidebar-width: 18rem;
+  width: var(--sidebar-width);
+  background-color: var(--bg-sidebar);
+  color: var(--text-sidebar-foreground);
+  padding: 0;
+}
+
+/* Desktop sidebar styles */
+.sidebarDesktop {
+  --sidebar-width: 16rem;
+  width: var(--sidebar-width);
+  background-color: var(--bg-sidebar);
+}
+
+/* Icon-only sidebar styles */
+.sidebarIcon {
+  --sidebar-width: 3rem;
+  width: var(--sidebar-width);
+}
