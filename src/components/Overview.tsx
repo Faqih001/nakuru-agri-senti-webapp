@@ -205,11 +205,8 @@ export const Overview = () => {
               );
             })}
           </div>
-        </div>
-      </div>
-
-      {/* Sidebar content area - 1/3 width on desktop */}
-      <div className="space-y-6">
+        </div>      {/* Weather and AI cards in a responsive grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Weather Card */}
         <Card className="shadow-md border border-blue-100">
           <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white pb-2">
@@ -280,8 +277,10 @@ export const Overview = () => {
             </Button>
           </CardContent>
         </Card>
-        
-        {/* Recent Activity */}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="shadow-md">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center">
@@ -313,14 +312,16 @@ export const Overview = () => {
             </div>
           </CardContent>
         </Card>
-        
-        {/* Quick Actions - Desktop Only */}
-        <div className="hidden lg:block">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
-            <span>Quick Actions</span>
-            <ChevronRight className="h-5 w-5 ml-1 text-green-600" />
-          </h2>
-          <div className="space-y-2">
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center">
+              <Zap className="h-5 w-5 mr-2 text-green-600" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
             {quickActions.map((action, index) => {
               const Icon = action.icon;
               return (
@@ -336,8 +337,8 @@ export const Overview = () => {
                 </Button>
               );
             })}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
