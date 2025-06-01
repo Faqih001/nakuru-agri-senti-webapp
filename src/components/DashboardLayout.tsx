@@ -86,8 +86,8 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Header - Full width */}
-      <header className="h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+      {/* Top Header - Full width, excluding sidebar width */}
+      <header className="h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-40 ml-0 lg:ml-64">
         <div className="flex items-center justify-between h-full px-4">
           <div className="flex items-center space-x-4">
             {/* Mobile menu button */}
@@ -103,15 +103,11 @@ export const DashboardLayout = () => {
               </Button>
             )}
 
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-green-500 to-green-600 p-2.5 rounded-lg shadow-md">
-                <Sprout className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-green-800 tracking-tight">AgriSenti</h1>
-                <p className="text-xs text-green-600 hidden sm:block">Smart Farming Platform</p>
-              </div>
+            {/* Weather Widget */}
+            <div className="flex items-center gap-2">
+              <Cloud className="w-5 h-5 text-blue-500" />
+              <span className="text-sm text-gray-700">24°C</span>
+              <span className="text-xs text-gray-500 hidden sm:inline">Partly Cloudy</span>
             </div>
 
             {/* Search Bar */}
@@ -126,20 +122,78 @@ export const DashboardLayout = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Help & Resources */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-green-700 hover:text-green-800 hover:bg-green-50 p-2 flex items-center gap-2"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span className="hidden md:inline">Help & Resources</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Get help with AgriSenti</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span>View Tutorials</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <PhoneCall className="w-4 h-4 mr-2" />
+                  <span>Contact Support</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {/* Quick Actions */}
+            <Button variant="ghost" size="sm" className="text-green-700 hover:bg-green-50">
+              <Zap className="w-5 h-5" />
+              <span className="hidden md:inline ml-2">Quick Actions</span>
+            </Button>
+            
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium flex items-center justify-center text-white">3</span>
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium flex items-center justify-center text-white">
+                2
+              </span>
             </Button>
 
             {/* User Avatar */}
-            <Button variant="ghost" size="sm" className="gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>{userInitials}</AvatarFallback>
-              </Avatar>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <Avatar className="h-8 w-8 border-2 border-green-100">
+                    <AvatarFallback className="bg-green-600 text-white">{userInitials}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-sm text-green-700 hidden sm:block">
+                    <div className="font-medium">Welcome back!</div>
+                    <div className="text-xs">{user?.email?.split('@')[0]}</div>
+                  </div>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="w-4 h-4 mr-2" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="w-4 h-4 mr-2" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -153,29 +207,40 @@ export const DashboardLayout = () => {
         />
       )}
 
-      {/* Sidebar - Now starts below the header */}
+      {/* Sidebar - Now at the top with the logo */}
       <aside
         className={cn(
-          "fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] bg-white border-r border-gray-200",
+          "fixed top-0 left-0 z-50 h-screen bg-white border-r border-gray-200",
           "transition-all duration-300 ease-in-out flex flex-col",
           isMobile 
             ? (isSidebarOpen ? "translate-x-0 shadow-xl w-72" : "-translate-x-full")
             : "w-64 translate-x-0"
         )}
       >
-        {/* Mobile close button - only on mobile */}
-        {isMobile && (
-          <div className="h-12 flex items-center px-4 border-b border-gray-100 justify-end">
+        {/* Logo Section - At the top of sidebar, same height as header */}
+        <div className="h-16 flex items-center px-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg shadow-sm">
+              <Sprout className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-green-800 text-lg tracking-tight">AgriSenti</h1>
+              <p className="text-xs text-green-600">Smart Farming Platform</p>
+            </div>
+          </div>
+          
+          {/* Mobile close button - only on mobile */}
+          {isMobile && (
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="ml-auto text-gray-500 hover:bg-gray-100 hover:text-gray-700"
               onClick={() => setIsSidebarOpen(false)}
             >
               <X className="h-5 w-5" />
             </Button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* User Profile Section */}
         <div className="p-4 border-b border-gray-100">
@@ -232,7 +297,7 @@ export const DashboardLayout = () => {
 
       {/* Main Content */}
       <div className={cn(
-        "transition-all duration-300 pt-16", // Added pt-16 to account for the fixed header
+        "transition-all duration-300 pt-16", // Account for the fixed header height
         isMobile ? "" : "ml-64"
       )}>
 
