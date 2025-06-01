@@ -369,7 +369,7 @@ The `verify-email` Supabase function:
 - Updates the user's profile to mark the email as verified
 - Returns a response with redirection information
 
-### Environment Configuration
+### Email Verification Environment Configuration
 
 The system behaves differently based on the environment:
 
