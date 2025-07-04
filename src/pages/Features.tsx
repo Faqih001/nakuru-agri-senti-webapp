@@ -85,30 +85,30 @@ const Features = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
+      <section className="relative py-16 md:py-20 lg:py-24 px-3 sm:px-4 lg:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-blue-600/10" />
         <div className="container mx-auto max-w-6xl relative">
-          <div className="text-center mb-16">
-            <Badge className="mb-4 bg-green-100 text-green-800 border-green-200">
+          <div className="text-center mb-12 md:mb-16">
+            <Badge className="mb-3 md:mb-4 bg-green-100 text-green-800 border-green-200 text-sm px-3 py-1">
               Latest Technology
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-green-800 to-emerald-700 bg-clip-text text-transparent mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-green-800 to-emerald-700 bg-clip-text text-transparent mb-4 md:mb-6 leading-tight">
               Revolutionary Farming Features
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               Discover how AgriSenti is transforming agriculture in Kenya with cutting-edge technology, 
               AI-powered insights, and comprehensive farming solutions.
             </p>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-12 md:mb-16">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-green-800 mb-2">
+              <div key={index} className="text-center bg-white/70 backdrop-blur-sm p-4 md:p-6 rounded-lg shadow-sm">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-800 mb-1 md:mb-2">
                   {stat.value}
                 </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-sm md:text-base text-gray-600 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -116,46 +116,46 @@ const Features = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4">
+      <section className="py-16 md:py-20 lg:py-24 px-3 sm:px-4 lg:px-6">
         <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-40 sm:h-48 overflow-hidden">
                   <img 
                     src={feature.image} 
                     alt={feature.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-20`} />
-                  <div className="absolute top-4 left-4">
-                    <div className={`bg-gradient-to-br ${feature.gradient} p-3 rounded-xl shadow-lg`}>
-                      <feature.icon className="w-6 h-6 text-white" />
+                  <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
+                    <div className={`bg-gradient-to-br ${feature.gradient} p-2 sm:p-3 rounded-xl shadow-lg`}>
+                      <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                   </div>
                 </div>
                 
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-bold text-gray-800">
+                <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
+                  <CardTitle className="text-lg md:text-xl font-bold text-gray-800">
                     {feature.title}
                   </CardTitle>
-                  <CardDescription className="text-gray-600 leading-relaxed">
+                  <CardDescription className="text-sm md:text-base text-gray-600 leading-relaxed">
                     {feature.description}
                   </CardDescription>
                 </CardHeader>
                 
-                <CardContent className="pt-0">
-                  <div className="space-y-2 mb-6">
+                <CardContent className="pt-0 p-4 md:p-6">
+                  <div className="space-y-2 mb-4 md:mb-6">
                     {feature.benefits.map((benefit, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span className="text-sm text-gray-700">{benefit}</span>
+                        <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-600 flex-shrink-0" />
+                        <span className="text-sm md:text-base text-gray-700">{benefit}</span>
                       </div>
                     ))}
                   </div>
                   
                   <Button 
-                    className="w-full group/btn bg-gray-900 hover:bg-gray-800"
+                    className="w-full group/btn bg-gray-900 hover:bg-gray-800 text-sm md:text-base"
                     onClick={() => navigate(`/features/${feature.id}`)}
                   >
                     Learn More
@@ -169,45 +169,45 @@ const Features = () => {
       </section>
 
       {/* Technology Showcase */}
-      <section className="py-20 px-4 bg-white/50">
+      <section className="py-16 md:py-20 lg:py-24 px-3 sm:px-4 lg:px-6 bg-white/50">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 md:mb-6 leading-tight">
               Powered by Advanced Technology
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               Our platform combines the latest in AI, machine learning, and agricultural science 
               to deliver unparalleled farming solutions.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center p-8 border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <div className="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="w-8 h-8 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <Card className="text-center p-6 md:p-8 border-0 bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-lg transition-shadow">
+              <div className="bg-blue-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Data Analytics</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Data Analytics</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                 Advanced analytics engine processing millions of data points for actionable insights.
               </p>
             </Card>
 
-            <Card className="text-center p-8 border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-              <div className="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Sprout className="w-8 h-8 text-white" />
+            <Card className="text-center p-6 md:p-8 border-0 bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-lg transition-shadow">
+              <div className="bg-green-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <Sprout className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">AI Models</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">AI Models</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                 Custom-trained AI models specifically designed for Kenyan agricultural conditions.
               </p>
             </Card>
 
-            <Card className="text-center p-8 border-0 bg-gradient-to-br from-purple-50 to-pink-50">
-              <div className="bg-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Cloud className="w-8 h-8 text-white" />
+            <Card className="text-center p-6 md:p-8 border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-shadow md:col-span-1 col-span-1 md:col-start-auto mx-auto w-full max-w-md md:max-w-none">
+              <div className="bg-purple-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <Cloud className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Cloud Infrastructure</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Cloud Infrastructure</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                 Reliable, scalable cloud infrastructure ensuring 99.9% uptime for our services.
               </p>
             </Card>
@@ -216,28 +216,28 @@ const Features = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4">
+      <section className="py-16 md:py-20 lg:py-24 px-3 sm:px-4 lg:px-6">
         <div className="container mx-auto max-w-4xl text-center">
-          <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-12 text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl md:rounded-3xl p-8 md:p-12 text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 leading-tight">
               Ready to Transform Your Farm?
             </h2>
-            <p className="text-xl mb-8 opacity-90">
+            <p className="text-base md:text-lg lg:text-xl mb-6 md:mb-8 opacity-90 leading-relaxed">
               Join thousands of farmers already using AgriSenti to increase yields, 
               reduce costs, and build sustainable farming practices.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+              <Link to="/auth" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="bg-white text-green-600 hover:bg-green-100 px-8 transition-colors"
+                  className="bg-white text-green-600 hover:bg-green-100 px-6 md:px-8 transition-colors w-full sm:w-auto"
                 >
                   Get Started Free
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <Link to="/contact">
-                <Button size="lg" variant="outline" className="border-white text-green-600 hover:bg-white/10 px-8">
+              <Link to="/contact" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-6 md:px-8 w-full sm:w-auto">
                   Contact Sales
                 </Button>
               </Link>

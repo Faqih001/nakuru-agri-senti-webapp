@@ -15,32 +15,32 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4 lg:px-6 py-3 lg:py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* Mobile menu toggle - only visible on small screens */}
+    <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50 shadow-sm">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Mobile menu toggle */}
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden text-green-700 hover:text-green-800 hover:bg-green-50 p-2"
+            className="lg:hidden text-green-700 hover:text-green-800 hover:bg-green-50 p-2 flex-shrink-0"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <Menu className="w-5 h-5" />
           </Button>
 
-          {/* Logo - now at the start */}
-          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 lg:p-2.5 rounded-lg shadow-md">
-              <Sprout className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+          {/* Logo */}
+          <Link to="/dashboard" className="flex items-center gap-2 sm:gap-3 hover:opacity-90 transition-opacity min-w-0">
+            <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 sm:p-2 lg:p-2.5 rounded-lg shadow-md flex-shrink-0">
+              <Sprout className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
             </div>
-            <div>
-              <h2 className="font-bold text-green-800 text-base lg:text-lg tracking-tight">AgriSenti</h2>
-              <p className="text-xs lg:text-sm text-green-600 hidden sm:block">Smart Farming Platform</p>
+            <div className="min-w-0">
+              <h2 className="font-bold text-green-800 text-sm sm:text-base lg:text-lg tracking-tight truncate">AgriSenti</h2>
+              <p className="text-xs lg:text-sm text-green-600 hidden sm:block truncate">Smart Farming Platform</p>
             </div>
           </Link>
         </div>
         
-        <div className="flex items-center gap-2 lg:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 flex-shrink-0">
           {/* Help & Resources Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -50,7 +50,7 @@ export const Header = () => {
                 className="text-green-700 hover:text-green-800 hover:bg-green-50 p-2 lg:px-3 flex items-center gap-2"
               >
                 <HelpCircle className="w-4 h-4 lg:w-5 lg:h-5" />
-                <span className="hidden sm:inline">Help & Resources</span>
+                <span className="hidden md:inline text-sm lg:text-base">Help & Resources</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -71,6 +71,7 @@ export const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
+          {/* Notifications */}
           <Button 
             variant="ghost" 
             size="sm" 
@@ -93,9 +94,9 @@ export const Header = () => {
                 >
                   <User className="w-4 h-4 lg:w-5 lg:h-5" />
                 </Button>
-                <div className="text-sm lg:text-base text-green-700 group-hover:text-green-800">
-                  <div className="font-medium">Welcome, Farmer</div>
-                  <div className="text-xs lg:text-sm hidden sm:block">Nakuru County</div>
+                <div className="text-sm lg:text-base text-green-700 group-hover:text-green-800 hidden sm:block min-w-0">
+                  <div className="font-medium text-xs sm:text-sm lg:text-base truncate">Welcome, Farmer</div>
+                  <div className="text-xs lg:text-sm text-green-600 hidden md:block truncate">Nakuru County</div>
                 </div>
               </div>
             </DropdownMenuTrigger>
