@@ -155,35 +155,35 @@ export const DiseaseDetection = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
       <Card className="bg-white/90 backdrop-blur-sm">
-        <CardHeader className="bg-green-600 text-white">
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
+        <CardHeader className="bg-green-600 text-white p-3 sm:p-4 lg:p-6">
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+            <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
             Disease Detection
           </CardTitle>
-          <p className="text-green-100 text-sm">
+          <p className="text-green-100 text-xs sm:text-sm">
             Upload a photo of your crop to detect diseases
           </p>
         </CardHeader>
         
-        <CardContent className="p-6">
-          <div className="space-y-4">
+        <CardContent className="p-3 sm:p-4 lg:p-6">
+          <div className="space-y-3 sm:space-y-4">
             <div 
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-green-400 transition-colors"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 lg:p-8 text-center cursor-pointer hover:border-green-400 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
               {selectedImage ? (
                 <img 
                   src={selectedImage} 
                   alt="Uploaded crop" 
-                  className="max-h-64 mx-auto rounded-lg"
+                  className="max-h-48 sm:max-h-56 lg:max-h-64 mx-auto rounded-lg"
                 />
               ) : (
                 <div className="space-y-2">
-                  <Upload className="w-12 h-12 mx-auto text-gray-400" />
-                  <p className="text-gray-600">Click to upload crop image</p>
-                  <p className="text-sm text-gray-500">
+                  <Upload className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto text-gray-400" />
+                  <p className="text-gray-600 text-sm sm:text-base">Click to upload crop image</p>
+                  <p className="text-xs sm:text-sm text-gray-500">
                     JPG, PNG up to 10MB
                   </p>
                 </div>
@@ -206,17 +206,17 @@ export const DiseaseDetection = () => {
             <Button 
               onClick={analyzeImage}
               disabled={!selectedImage || isAnalyzing}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-2.5"
             >
               {isAnalyzing ? "Analyzing..." : "Analyze Image"}
             </Button>
             
-            <div className="text-sm text-gray-600 space-y-1">
+            <div className="text-xs sm:text-sm text-gray-600 space-y-1">
               <p><strong>Tips for best results:</strong></p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>Take clear, well-lit photos</li>
                 <li>Focus on affected leaves or stems</li>
-                <li>Include multiple angles if possible</li>
+                <li className="hidden sm:list-item">Include multiple angles if possible</li>
                 <li>Avoid blurry or dark images</li>
               </ul>
             </div>
@@ -226,11 +226,11 @@ export const DiseaseDetection = () => {
 
       {isAnalyzing ? (
         <Card className="bg-white/90 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Analyzing image...</p>
-              <p className="text-sm text-gray-500 mt-2">
+          <CardContent className="p-3 sm:p-4 lg:p-6">
+            <div className="text-center py-8 sm:py-12 lg:py-16">
+              <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 border-b-2 border-green-600 mx-auto mb-3 sm:mb-4"></div>
+              <p className="text-gray-600 text-sm sm:text-base">Analyzing image...</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
                 Our AI is examining your crop for diseases and pests
               </p>
             </div>
@@ -247,18 +247,18 @@ export const DiseaseDetection = () => {
         />
       ) : (
         <Card className="bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-600" />
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
               Analysis Results
             </CardTitle>
           </CardHeader>
           
-          <CardContent className="p-6">
-            <div className="text-center py-16 text-gray-500">
-              <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>Upload an image to get started</p>
-              <p className="text-sm mt-1">
+          <CardContent className="p-3 sm:p-4 lg:p-6">
+            <div className="text-center py-8 sm:py-12 lg:py-16 text-gray-500">
+              <Camera className="w-8 h-8 sm:w-10 sm:w-10 lg:w-12 lg:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+              <p className="text-sm sm:text-base">Upload an image to get started</p>
+              <p className="text-xs sm:text-sm mt-1">
                 Our AI will analyze your crop and provide treatment recommendations
               </p>
             </div>

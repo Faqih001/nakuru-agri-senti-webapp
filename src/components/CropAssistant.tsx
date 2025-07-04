@@ -170,39 +170,39 @@ export const CropAssistant = () => {
   ];
   
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col min-h-[calc(100vh-8rem)]">
       <Card className="flex-1 flex flex-col overflow-hidden border shadow-md">
         <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-          <ScrollArea className="flex-1 overflow-y-auto p-4">
-            <div className="flex flex-col space-y-4">
+          <ScrollArea className="flex-1 overflow-y-auto p-2 sm:p-4">
+            <div className="flex flex-col space-y-3 sm:space-y-4">
               {messages.map((message) => (
                 <div 
                   key={message.id}
-                  className={`flex items-start gap-2 ${
+                  className={`flex items-start gap-1.5 sm:gap-2 ${
                     message.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   {message.sender === "bot" && (
-                    <div className="bg-green-600 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+                    <div className="bg-green-600 p-1 sm:p-1.5 md:p-2 rounded-full flex-shrink-0">
                       <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </div>
                   )}
                   
                   <div
-                    className={`max-w-[85%] sm:max-w-[80%] p-2 sm:p-3 rounded-lg break-words ${
+                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] p-2 sm:p-3 rounded-lg break-words ${
                       message.sender === "user"
                         ? "bg-green-600 text-white"
                         : "bg-gray-100 text-gray-900"
                     }`}
                   >
-                    <p className="text-xs sm:text-sm leading-relaxed">{message.text}</p>
+                    <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                     <p className="text-xs opacity-70 mt-1">
                       {message.timestamp.toLocaleTimeString()}
                     </p>
                   </div>
                   
                   {message.sender === "user" && (
-                    <div className="bg-gray-600 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+                    <div className="bg-gray-600 p-1 sm:p-1.5 md:p-2 rounded-full flex-shrink-0">
                       <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </div>
                   )}
@@ -210,8 +210,8 @@ export const CropAssistant = () => {
               ))}
               
               {isLoading && (
-                <div className="flex items-start gap-2">
-                  <div className="bg-green-600 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+                <div className="flex items-start gap-1.5 sm:gap-2">
+                  <div className="bg-green-600 p-1 sm:p-1.5 md:p-2 rounded-full flex-shrink-0">
                     <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                   <div className="bg-gray-100 p-2 sm:p-3 rounded-lg">
@@ -227,7 +227,7 @@ export const CropAssistant = () => {
             </div>
           </ScrollArea>
           
-          <div className="p-2 sm:p-4 border-t bg-gray-50 flex-shrink-0">
+          <div className="p-2 sm:p-3 md:p-4 border-t bg-gray-50 flex-shrink-0">
             <div className="flex gap-1 sm:gap-2 mb-2 sm:mb-3 flex-wrap">
               {quickQuestions.map((question, index) => (
                 <Button
@@ -235,9 +235,9 @@ export const CropAssistant = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setInputValue(question)}
-                  className="text-xs px-2 py-1 sm:px-3 sm:py-2 h-auto whitespace-nowrap"
+                  className="text-xs px-2 py-1 sm:px-3 sm:py-2 h-auto whitespace-nowrap flex-shrink-0"
                 >
-                  {question}
+                  {isMobile && question.length > 15 ? question.substring(0, 15) + "..." : question}
                 </Button>
               ))}
             </div>
@@ -246,7 +246,7 @@ export const CropAssistant = () => {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about crops, weather, fertilizers..."
+                placeholder={isMobile ? "Ask about farming..." : "Ask about crops, weather, fertilizers..."}
                 onKeyDown={handleKeyDown}
                 disabled={isLoading}
                 className="text-sm flex-1 min-w-0"
@@ -255,10 +255,14 @@ export const CropAssistant = () => {
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !inputValue.trim()}
-                className="bg-green-600 hover:bg-green-700 flex-shrink-0 px-3 sm:px-4"
+                className="bg-green-600 hover:bg-green-700 flex-shrink-0 px-2 sm:px-3 md:px-4"
                 size="sm"
               >
-                <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                {isLoading ? (
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                ) : (
+                  <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                )}
               </Button>
             </div>
           </div>
