@@ -8,8 +8,14 @@ import { FormattedMessage } from "@/components/FormattedMessage";
 
 export const WeatherDashboard = () => {
   // Initialize Gemini API with useMemo to prevent recreating on every render
-  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
-  const genAI = useMemo(() => new GoogleGenerativeAI(API_KEY), [API_KEY]);
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+  const genAI = useMemo(() => {
+    if (!API_KEY) {
+      console.error("VITE_GEMINI_API_KEY is not configured");
+      return null;
+    }
+    return new GoogleGenerativeAI(API_KEY);
+  }, [API_KEY]);
   
   const [loading, setLoading] = useState(false);
   const [farmingInsight, setFarmingInsight] = useState("");
@@ -40,7 +46,12 @@ export const WeatherDashboard = () => {
     setInsightError("");
     
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      if (!genAI) {
+        setInsightError("AI service is not properly configured. Please check your API key.");
+        return;
+      }
+
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const weatherSummary = `
         Current weather in Nakuru: ${weatherData.current.temperature}°C, ${weatherData.current.condition}
@@ -89,10 +100,21 @@ export const WeatherDashboard = () => {
       const response = await result.response;
       const text = response.text();
       
+      console.log("Weather AI Response:", text);
       setFarmingInsight(text);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error getting farming insights:", error);
-      setInsightError("Failed to generate farming insights. Please try again later.");
+      
+      // Handle specific error types
+      if (error?.message?.includes('API_KEY_INVALID')) {
+        setInsightError("Invalid API key. Please check your configuration.");
+      } else if (error?.message?.includes('QUOTA_EXCEEDED')) {
+        setInsightError("AI service quota exceeded. Please try again later.");
+      } else if (error?.message?.includes('fetch')) {
+        setInsightError("Network error. Please check your internet connection.");
+      } else {
+        setInsightError("Failed to generate farming insights. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }

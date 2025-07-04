@@ -4,9 +4,9 @@ import { FormattedMessage } from './FormattedMessage';
 import { createStructuredPrompt } from '@/lib/chatFormat';
 
 // Constants
-const MODEL_NAME = 'gemini-2.5-flash-preview-05-20';  // Using the preview model
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(API_KEY);
+const MODEL_NAME = 'gemini-1.5-flash';  // Using stable model
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 interface Message {
   role: 'user' | 'model' | 'error';
@@ -98,6 +98,16 @@ I'm here to help you with:
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
+    if (!genAI) {
+      const errorMessage: Message = {
+        role: 'error',
+        content: 'API Configuration Error: Gemini API key is not configured. Please check your environment variables.',
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
     const userMessage: Message = {
       role: 'user',
       content: inputValue,
@@ -126,22 +136,45 @@ I'm here to help you with:
       // Get recent context but limit to last 10 messages
       const recentMessages = [...messages.slice(-10), userMessage];
       const parts = [getOptimizedPrompt(userMessage.content)];
+      
+      console.log("Sending prompt to Gemini:", parts[0]); // For debugging
+      
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
       const result = await model.generateContent(parts);
       const response = result.response;
+      const responseText = response.text();
+      
+      console.log("Gemini response:", responseText); // For debugging
+
+      if (!responseText || responseText.trim().length === 0) {
+        throw new Error("Empty response from Gemini API");
+      }
 
       // Add model response
       const assistantMessage: Message = {
         role: 'model',
-        content: response.text(),
+        content: responseText,
         timestamp: Date.now()
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error generating response:', error);
+      
+      let errorContent = 'I apologize, but I encountered an error processing your request. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes("API_KEY")) {
+          errorContent = 'Invalid API key. Please check your Gemini API configuration.';
+        } else if (error.message.includes("quota")) {
+          errorContent = 'API quota exceeded. Please try again later.';
+        } else if (error.message.includes("network")) {
+          errorContent = 'Network error. Please check your internet connection.';
+        }
+      }
+      
       const errorMessage: Message = {
         role: 'error',
-        content: 'I apologize, but I encountered an error processing your request. Please try again.',
+        content: errorContent,
         timestamp: Date.now()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -304,7 +337,7 @@ I'm here to help you with:
                 />
                 <button
                   type="submit"
-                  disabled={!inputValue.trim() || isLoading}
+                  disabled={!inputValue.trim() || isLoading || !genAI}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-green-500 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
                   aria-label="Send message"
                 >

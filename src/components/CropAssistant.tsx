@@ -22,8 +22,8 @@ interface Message {
 
 export const CropAssistant = () => {
   // Initialize Gemini API
-  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDEFsF9visXbuZfNEvtPvC8wI_deQBH-ro";
-  const genAI = new GoogleGenerativeAI(API_KEY);
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+  const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
   
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -71,6 +71,15 @@ I'm here to help you with farming in Nakuru County. I can assist with:
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
+    if (!genAI) {
+      toast({
+        title: "API Configuration Error",
+        description: "Gemini API key is not configured. Please check your environment variables.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue,
@@ -114,14 +123,26 @@ I'm here to help you with farming in Nakuru County. I can assist with:
       // Remove thinking message and show error
       setMessages(prev => prev.filter(m => !m.thinking));
       
-      const errorMessage: Message = {
+      let errorMessage = "Sorry, I'm having trouble generating a response. Please try again later.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("API_KEY")) {
+          errorMessage = "Invalid API key. Please check your Gemini API configuration.";
+        } else if (error.message.includes("quota")) {
+          errorMessage = "API quota exceeded. Please try again later.";
+        } else if (error.message.includes("network")) {
+          errorMessage = "Network error. Please check your internet connection.";
+        }
+      }
+      
+      const errorMsg: Message = {
         id: (Date.now() + 100).toString(),
-        text: "Sorry, I'm having trouble generating a response. Please try again later.",
+        text: errorMessage,
         sender: "bot",
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMsg]);
       
       toast({
         title: "Error",
@@ -134,21 +155,44 @@ I'm here to help you with farming in Nakuru County. I can assist with:
   };
 
   const generateGeminiResponse = async (question: string): Promise<string> => {
+    if (!genAI) {
+      throw new Error("Gemini API not initialized");
+    }
+
     try {
-      // Get the generative model (upgraded to Gemini-2.0-flash)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      // Get the generative model (using stable version)
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       // Create a structured prompt using the utility function
       const prompt = createStructuredPrompt(question, isMobile);
+      
+      console.log("Sending prompt to Gemini:", prompt); // For debugging
       
       // Generate content using Gemini API
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
+      console.log("Gemini response:", text); // For debugging
+      
+      if (!text || text.trim().length === 0) {
+        throw new Error("Empty response from Gemini API");
+      }
+      
       return text;
     } catch (error) {
       console.error("Error calling Gemini API:", error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes("API_KEY")) {
+          throw new Error("Invalid Gemini API key");
+        } else if (error.message.includes("quota")) {
+          throw new Error("API quota exceeded");
+        } else if (error.message.includes("network")) {
+          throw new Error("Network error occurred");
+        }
+      }
+      
       throw new Error("Failed to generate response from Gemini API");
     }
   };
@@ -259,12 +303,14 @@ I'm here to help you with farming in Nakuru County. I can assist with:
               />
               <Button 
                 onClick={handleSendMessage} 
-                disabled={isLoading || !inputValue.trim()}
+                disabled={isLoading || !inputValue.trim() || !genAI}
                 className="bg-green-600 hover:bg-green-700 flex-shrink-0 px-2 sm:px-3 md:px-4"
                 size="sm"
               >
                 {isLoading ? (
                   <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                ) : !genAI ? (
+                  <span className="text-xs">API Error</span>
                 ) : (
                   <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
