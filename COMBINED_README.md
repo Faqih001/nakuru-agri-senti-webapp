@@ -673,7 +673,7 @@ The AgriSenti project is developed and maintained by a dedicated team with exper
 - **Chiboniso Nyoni** - User Experience Lead  
   UX expert focused on creating intuitive, family-friendly interfaces that make learning accessible
 
-Our diverse team brings together experience in agricultural science, software development, UI/UX design, and community engagement to create a solution that truly meets the needs of Nakuru's farming community.
+Our diverse team brings together experience in educational technology, AI systems, user experience design, and family-centered solutions to create a platform that empowers farmers through accessible and intuitive technology.
 
 ## Acknowledgments
 
