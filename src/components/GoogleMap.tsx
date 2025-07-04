@@ -3,7 +3,19 @@ import React from 'react';
 
 const GoogleMap = () => {
   // Get Google Maps API key from environment variables
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDPgttFbKx3V_mzD-UMAV0fWHDyU-QBk3c';
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  
+  // Don't render the map if API key is not configured
+  if (!googleMapsApiKey) {
+    return (
+      <div className="relative w-full h-80 rounded-lg overflow-hidden shadow-lg bg-gray-100 flex items-center justify-center">
+        <div className="text-center p-4">
+          <h3 className="font-semibold text-gray-600 mb-2">Map Unavailable</h3>
+          <p className="text-sm text-gray-500">Google Maps API key not configured</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="relative w-full h-80 rounded-lg overflow-hidden shadow-lg">
