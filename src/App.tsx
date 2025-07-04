@@ -16,6 +16,7 @@ import { DiseaseDetection } from "@/components/DiseaseDetection";
 import { MarketDashboard } from "@/components/MarketDashboard";
 import { WeatherDashboard } from "@/pages/WeatherDashboard";
 import { Settings } from "@/pages/Settings";
+import { ProfilePage } from "@/pages/ProfilePage";
 import Help from "@/pages/Help";
 import FeatureDetail from "./pages/FeatureDetail";
 import About from "./pages/About";
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="weather" element={<WeatherDashboard />} />
               <Route path="market" element={<MarketDashboard />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="help" element={<Help />} />
             </Route>
 
