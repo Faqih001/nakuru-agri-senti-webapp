@@ -237,11 +237,20 @@ export const DashboardLayout = () => {
       {/* Sidebar - Enhanced design */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-screen bg-white/95 backdrop-blur-sm border-r border-gray-200/80 shadow-xl",
+          // Adjust top and height to sit below header
+          "fixed left-0 z-50 bg-white/95 backdrop-blur-sm border-r border-gray-200/80 shadow-xl",
           "transition-all duration-300 ease-in-out flex flex-col",
-          isMobile 
-            ? (isSidebarOpen ? "translate-x-0 w-72 sm:w-80" : "-translate-x-full")
-            : "w-64 translate-x-0"
+          isMobile
+            ? [
+                isSidebarOpen ? "translate-x-0 w-72 sm:w-80" : "-translate-x-full",
+                "top-14 sm:top-16",
+                "h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)]"
+              ].join(' ')
+            : [
+                "w-64 translate-x-0",
+                "top-14 sm:top-16",
+                "h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)]"
+              ].join(' ')
         )}
         style={{ marginTop: 0, paddingTop: 0 }}
       >
