@@ -278,9 +278,9 @@ Located in `public/assets/images/`:
 
 Located in `public/assets/team/`:
 
-- **team-member-1.png** - Photo of Fakii Mohammed (CEO & Founder)
-- **team-member-2.png** - Photo of Muna Adan (CTO)
-- **team-member-3.png** - Photo of Charmaine Ramaphala (Head of Operations)
+- **team-member-1.png** - Photo of Fakii Mohammed (CEO)
+- **team-member-2.png** - Andrew Ogembo (CTO) - Uses icon
+- **team-member-3.png** - Chiboniso Nyoni (User Experience Lead) - Uses icon
 
 ### Icons
 
@@ -326,15 +326,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Meet Our Team
 
-The AgriSenti project is developed and maintained by a dedicated team with expertise in agricultural technology and software development:
+The AgriSenti project is developed and maintained by a dedicated team with expertise in educational technology, AI systems, and user experience design:
 
-- **Fakii Mohammed** - CEO & Founder  
-  Agricultural technology visionary with a passion for empowering farmers
+- **Fakii Mohammed** - CEO  
+  Visionary leader with extensive experience in educational technology and family-centered solutions
 
-- **Muna Adan** - CTO  
-  Tech innovator specializing in AI and agricultural applications
+- **Andrew Ogembo** - CTO  
+  Technical architect specializing in AI systems and scalable educational platforms
 
-- **Charmaine Ramaphala** - Head of Operations  
-  Operations expert ensuring seamless service delivery to farmers
+- **Chiboniso Nyoni** - User Experience Lead  
+  UX expert focused on creating intuitive, family-friendly interfaces that make learning accessible
 
-Our diverse team brings together experience in agricultural science, software development, UI/UX design, and community engagement to create a solution that truly meets the needs of Nakuru's farming community.
+Our diverse team brings together experience in educational technology, AI systems, user experience design, and family-centered solutions to create a platform that empowers farmers through accessible and intuitive technology.
