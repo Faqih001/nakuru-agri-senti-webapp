@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { FormattedMessage } from "./FormattedMessage";
+import { createStructuredPrompt } from "@/lib/chatFormat";
 
 interface Message {
   id: string;
@@ -26,7 +28,17 @@ export const CropAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Habari! I'm your AgriSenti assistant. I can help you with crop management, planting schedules, fertilizer recommendations, and more. What would you like to know about farming in Nakuru?",
+      text: `**Habari! Welcome to AgriSenti Assistant** 🌱
+
+I'm here to help you with farming in Nakuru County. I can assist with:
+
+• **Crop Management** - Planting schedules and care tips
+• **Fertilizer Recommendations** - Best products for your soil
+• **Pest & Disease Control** - Identification and treatment
+• **Weather Insights** - Current conditions and forecasts
+• **Market Information** - Prices and selling opportunities
+
+**Ask me anything about farming!** What would you like to know today?`,
       sender: "bot",
       timestamp: new Date()
     }
@@ -126,22 +138,8 @@ export const CropAssistant = () => {
       // Get the generative model (upgraded to Gemini-2.0-flash)
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       
-      // Create the prompt with context about farming in Nakuru, Kenya
-      const prompt = `
-      Act as an agricultural assistant for farmers in Nakuru County, Kenya. 
-      You are an expert in African agriculture, specifically for the Nakuru region.
-      Provide helpful, accurate advice about:
-      - Local crops (maize, beans, potatoes, vegetables, etc.)
-      - Farming practices suitable for Nakuru's climate and soil
-      - Pest and disease management relevant to this region
-      - Fertilizer recommendations appropriate for local soil conditions
-      - Weather patterns and planting schedules for Nakuru
-      
-      User question: ${question}
-      
-      Keep your answers practical, specific to Nakuru County, and suitable for smallholder farmers. 
-      Respond in a helpful, concise manner with actionable advice.
-      `;
+      // Create a structured prompt using the utility function
+      const prompt = createStructuredPrompt(question, isMobile);
       
       // Generate content using Gemini API
       const result = await model.generateContent(prompt);
@@ -163,10 +161,10 @@ export const CropAssistant = () => {
   };
 
   const quickQuestions = [
-    "What fertilizer should I use?",
-    "How to control pests?",
-    "When should I plant?",
-    "Weather forecast for Nakuru"
+    "What fertilizers work best for maize in Nakuru?",
+    "How do I control fall armyworm in my crops?", 
+    "When is the best time to plant potatoes?",
+    "Current weather forecast for farming"
   ];
   
   return (
@@ -195,7 +193,14 @@ export const CropAssistant = () => {
                         : "bg-gray-100 text-gray-900"
                     }`}
                   >
-                    <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    {message.sender === "user" ? (
+                      <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    ) : (
+                      <FormattedMessage 
+                        content={message.text} 
+                        className="text-xs sm:text-sm leading-relaxed text-gray-900"
+                      />
+                    )}
                     <p className="text-xs opacity-70 mt-1">
                       {message.timestamp.toLocaleTimeString()}
                     </p>

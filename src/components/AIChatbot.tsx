@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { FormattedMessage } from './FormattedMessage';
+import { createStructuredPrompt } from '@/lib/chatFormat';
 
 // Constants
 const MODEL_NAME = 'gemini-2.5-flash-preview-05-20';  // Using the preview model
@@ -78,18 +80,7 @@ export const AIChatbot: React.FC = () => {
 
   // Helper function to optimize prompt based on device size
   const getOptimizedPrompt = (input: string): string => {
-    const basePrompt = `You are an AI assistant for AgriSenti, specializing in agricultural topics.
-    Focus on providing practical farming advice, weather insights, crop information, and market data.
-    Current date: ${new Date().toLocaleDateString()}`;
-    
-    if (isMobileView) {
-      return `${basePrompt}
-      IMPORTANT: User is on mobile - keep responses concise.
-      Limit response to 150-200 words maximum. User query: ${input}`;
-    }
-    
-    return `${basePrompt}
-    User query: ${input}`;
+    return createStructuredPrompt(input, isMobileView);
   };
 
   // Handle form submission
@@ -107,7 +98,7 @@ export const AIChatbot: React.FC = () => {
     setInputValue('');
     setIsLoading(true);
 
-    let loadingTimeout: ReturnType<typeof setTimeout>;
+    let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     try {
       // Show loading after 1 second if still processing
@@ -145,7 +136,9 @@ export const AIChatbot: React.FC = () => {
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
-      clearTimeout(loadingTimeout);
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
       setIsLoading(false);
     }
   };
@@ -245,7 +238,14 @@ export const AIChatbot: React.FC = () => {
                       : 'bg-white border border-gray-100'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap text-[15px]">{message.content}</p>
+                  {message.role === 'user' ? (
+                    <p className="whitespace-pre-wrap text-[15px]">{message.content}</p>
+                  ) : (
+                    <FormattedMessage 
+                      content={message.content} 
+                      className="text-[15px] text-gray-800"
+                    />
+                  )}
                   <span className={`text-[11px] mt-1 block ${
                     message.role === 'user' 
                       ? 'text-white/75'
