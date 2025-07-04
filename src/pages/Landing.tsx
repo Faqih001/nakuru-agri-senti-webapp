@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sprout, Camera, TrendingUp, Shield, Users, Zap, ArrowRight, Check, Star, Quote, Play, BarChart, Globe, Award, Crown, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DemoDashboard } from "@/components/DemoDashboard";
+import { useState } from "react";
 
 const Landing = () => {
   const features = [
@@ -115,8 +116,51 @@ const Landing = () => {
     }
   ];
 
+  // State for demo video modal
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  // Modal component for video
+  const DemoVideoModal = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-2xl md:max-w-3xl lg:max-w-4xl mx-2 sm:mx-4 p-2 sm:p-4 md:p-6 relative flex flex-col items-center"
+      >
+        <button
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-500 hover:text-red-600 text-2xl font-bold focus:outline-none"
+          onClick={() => setIsVideoOpen(false)}
+          aria-label="Close video modal"
+        >
+          &times;
+        </button>
+        <div className="w-full flex justify-center items-center">
+          <video
+            src="/Nakuru-Agri-SentiWebApp.mp4"
+            controls
+            className="w-full h-auto rounded-lg mb-4 bg-black"
+            style={{
+              maxHeight: '60vh',
+              minHeight: '180px',
+              aspectRatio: '16/9',
+              objectFit: 'contain',
+            }}
+          />
+        </div>
+        <div className="flex gap-2 w-full justify-center">
+          <button
+            className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+            onClick={() => setIsVideoOpen(false)}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen">
+      {/* Demo Video Modal */}
+      {isVideoOpen && <DemoVideoModal />}
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-green-50 to-emerald-100 pt-20 pb-16 md:py-24 lg:py-32 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -144,7 +188,12 @@ const Landing = () => {
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 w-full sm:w-auto group py-3 px-6">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-green-600 text-green-600 hover:bg-green-50 w-full sm:w-auto group py-3 px-6"
+                  onClick={() => setIsVideoOpen(true)}
+                >
                   <Play className="w-5 h-5 mr-2" />
                   Watch Demo
                 </Button>
