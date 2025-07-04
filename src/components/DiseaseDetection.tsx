@@ -70,19 +70,33 @@ export const DiseaseDetection = () => {
       
       // Create prompt for plant disease analysis
       const prompt = `
-      Analyze this crop image for any signs of disease or pest infestation. 
-      Focus on identifying common plant diseases and pests in Nakuru, Kenya.
+      **Analyze this crop image for diseases and pests in Nakuru, Kenya.**
       
-      For any identified issue, provide the following information in a structured format:
-      1. Disease/pest name
-      2. Confidence level (as a percentage)
-      3. Severity level (None, Low, Medium, High)
-      4. Brief description of what you're seeing
-      5. Recommended treatment options (as a bullet list)
-      6. Prevention measures (as a bullet list)
+      **Format your response with clear structure:**
+      - Use headings followed by colons
+      - Use bullet points (•) for lists
+      - Be specific to Nakuru region crops
       
-      If the plant appears healthy, please indicate that as well.
-      Provide your analysis in a structured format that can be easily parsed.
+      **For any identified issue, provide:**
+      
+      **Disease/Pest Identification:**
+      - Name and confidence level (percentage)
+      - Severity level (None, Low, Medium, High)
+      
+      **Description:**
+      - What you observe in the image
+      
+      **Treatment Options:**
+      • Specific recommended treatments
+      • Products available in Kenya
+      • Application methods
+      
+      **Prevention Measures:**
+      • Future prevention strategies
+      • Best practices for Nakuru farmers
+      
+      If the plant appears healthy, clearly indicate that as well.
+      Keep response practical and actionable for local farmers.
       `;
       
       // Generate content with the image

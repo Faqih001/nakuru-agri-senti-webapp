@@ -20,7 +20,17 @@ export const AIChatbot: React.FC = () => {
     const savedMessages = localStorage.getItem('agrisenti-chat-history');
     return savedMessages ? JSON.parse(savedMessages) : [{
       role: 'model',
-      content: 'Hello! I\'m your AgriSenti AI assistant. How can I help you with farming, weather, crops, or market information today?',
+      content: `**Hello! I'm your AgriSenti AI Assistant** 🌾
+
+I'm here to help you with:
+
+• **Farming Advice** - Crop management and best practices
+• **Weather Information** - Current conditions and forecasts  
+• **Crop Guidance** - Planting, fertilizing, and harvesting
+• **Market Insights** - Prices and selling opportunities
+• **Pest Management** - Identification and control methods
+
+**How can I assist you with your farming needs today?**`,
       timestamp: Date.now()
     }];
   });

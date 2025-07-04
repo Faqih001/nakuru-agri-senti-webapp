@@ -4,6 +4,7 @@ import { ThermometerSun, Wind, Droplets, Sun, CloudRain, Clock, AlertTriangle } 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { FormattedMessage } from "@/components/FormattedMessage";
 
 export const WeatherDashboard = () => {
   // Initialize Gemini API with useMemo to prevent recreating on every render
@@ -56,19 +57,32 @@ export const WeatherDashboard = () => {
       `;
       
       const prompt = `
-        Based on the following weather data for Nakuru, Kenya, provide practical farming advice
-        for local farmers. Consider seasonal crops common in Nakuru County, such as maize, beans,
-        potatoes, and vegetables.
+        You are an agricultural weather expert for Nakuru County, Kenya. 
+        
+        **Format your response with clear structure using:**
+        - Headings followed by colons (e.g., "Recommended Activities:")
+        - Bullet points (•) for lists
+        - Numbered steps for sequential actions
+        
+        Based on the following weather data for Nakuru, provide practical farming advice:
         
         ${weatherSummary}
         
-        Provide specific recommendations about:
-        1. What farming activities are recommended in these weather conditions
-        2. Any precautions farmers should take
-        3. Optimal irrigation advice given the forecast
-        4. Pest or disease risks that might increase in these conditions
+        **Provide specific recommendations about:**
         
-        Keep your response under 200 words, practical, and specific to Nakuru's agricultural context.
+        **Recommended Activities:**
+        - What farming activities are optimal in these conditions
+        
+        **Precautions:**
+        - Any safety measures farmers should take
+        
+        **Irrigation Advice:**
+        - Optimal watering schedule given the forecast
+        
+        **Pest & Disease Risks:**
+        - Potential threats that might increase in these conditions
+        
+        Keep response under 200 words, practical, and specific to Nakuru's agricultural context.
       `;
       
       const result = await model.generateContent(prompt);
@@ -220,7 +234,10 @@ export const WeatherDashboard = () => {
           ) : (
             <>
               <div className="prose prose-sm max-w-none">
-                <p className="whitespace-pre-line text-gray-700 text-xs sm:text-sm leading-relaxed">{farmingInsight}</p>
+                <FormattedMessage 
+                  content={farmingInsight} 
+                  className="text-gray-700"
+                />
               </div>
               <div className="mt-3 sm:mt-4 text-right">
                 <Button 

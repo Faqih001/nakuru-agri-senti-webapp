@@ -145,3 +145,44 @@
     @apply w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))];
   }
 }
+
+/* Chatbot Formatted Message Styles */
+.formatted-message {
+  line-height: 1.6;
+}
+
+.formatted-message strong {
+  @apply font-semibold text-gray-900;
+}
+
+.formatted-message ul {
+  @apply list-disc list-inside space-y-1 ml-2 my-2;
+}
+
+.formatted-message ol {
+  @apply list-decimal list-inside space-y-1 ml-2 my-2;
+}
+
+.formatted-message li {
+  @apply text-gray-800 leading-relaxed;
+}
+
+.formatted-message p {
+  @apply mb-2 text-gray-800;
+}
+
+.formatted-message p:last-child {
+  @apply mb-0;
+}
+
+/* Mobile responsive adjustments for formatted messages */
+@media (max-width: 640px) {
+  .formatted-message {
+    font-size: 0.875rem;
+  }
+  
+  .formatted-message ul,
+  .formatted-message ol {
+    @apply ml-1 space-y-0.5;
+  }
+}
