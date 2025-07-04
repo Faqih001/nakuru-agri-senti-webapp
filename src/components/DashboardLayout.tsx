@@ -243,6 +243,7 @@ export const DashboardLayout = () => {
             ? (isSidebarOpen ? "translate-x-0 w-72 sm:w-80" : "-translate-x-full")
             : "w-64 translate-x-0"
         )}
+        style={{ marginTop: 0, paddingTop: 0 }}
       >
         {/* Logo Section - Enhanced */}
         <div className="h-14 sm:h-16 flex items-center px-4 sm:px-6 border-b border-gray-200/80 bg-gradient-to-r from-green-50 to-emerald-50">
