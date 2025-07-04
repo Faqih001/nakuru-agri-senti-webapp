@@ -251,13 +251,18 @@ export const DashboardLayout = () => {
             </Avatar>
             <div>
               <div className="font-medium text-gray-900">{user?.email?.split('@')[0]}</div>
-              <div className="text-xs text-gray-500 truncate max-w-[180px]">{user?.email}</div>
+              <div className="text-xs text-gray-500">Farmer</div>
             </div>
           </div>
         </div>
 
+        {/* Navigation Section Label */}
+        <div className="px-5 pt-5 pb-2">
+          <h3 className="text-xs uppercase font-medium text-gray-500 tracking-wider">MAIN</h3>
+        </div>
+        
         {/* Navigation Items */}
-        <nav className="flex-1 py-4 overflow-y-auto">
+        <nav className="flex-1 overflow-y-auto">
           {sidebarItems.map((item) => (
             <NavLink
               key={item.path}
@@ -268,7 +273,7 @@ export const DashboardLayout = () => {
                 cn(
                   "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors",
                   isActive
-                    ? "text-green-700 bg-green-50/80 font-semibold"
+                    ? "text-green-700 bg-green-50/80 font-semibold border-r-4 border-green-500"
                     : "text-gray-600 hover:text-green-600 hover:bg-green-50/60"
                 )
               }
@@ -280,6 +285,67 @@ export const DashboardLayout = () => {
               )}
             </NavLink>
           ))}
+        </nav>
+        
+        {/* Settings Section Label */}
+        <div className="px-5 pt-5 pb-2">
+          <h3 className="text-xs uppercase font-medium text-gray-500 tracking-wider">SETTINGS</h3>
+        </div>
+        
+        {/* Settings Navigation */}
+        <nav className="pb-2">
+          <NavLink
+            to="/dashboard/profile"
+            className={({ isActive }) =>
+              cn(
+                "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors",
+                isActive
+                  ? "text-green-700 bg-green-50/80 font-semibold border-r-4 border-green-500"
+                  : "text-gray-600 hover:text-green-600 hover:bg-green-50/60"
+              )
+            }
+          >
+            <User className="w-5 h-5 flex-shrink-0" />
+            <span className="ml-3">Profile</span>
+          </NavLink>
+          
+          <NavLink
+            to="/dashboard/settings"
+            className={({ isActive }) =>
+              cn(
+                "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors",
+                isActive
+                  ? "text-green-700 bg-green-50/80 font-semibold border-r-4 border-green-500"
+                  : "text-gray-600 hover:text-green-600 hover:bg-green-50/60"
+              )
+            }
+          >
+            <Settings className="w-5 h-5 flex-shrink-0" />
+            <span className="ml-3">Settings</span>
+          </NavLink>
+        </nav>
+        
+        {/* Help & Resources Section Label */}
+        <div className="px-5 pt-5 pb-2">
+          <h3 className="text-xs uppercase font-medium text-gray-500 tracking-wider">HELP & RESOURCES</h3>
+        </div>
+        
+        {/* Help Navigation */}
+        <nav className="pb-4">
+          <NavLink
+            to="/dashboard/help?tab=tutorials"
+            className={({ isActive }) =>
+              cn(
+                "flex items-center px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors",
+                isActive
+                  ? "text-green-700 bg-green-50/80 font-semibold border-r-4 border-green-500"
+                  : "text-gray-600 hover:text-green-600 hover:bg-green-50/60"
+              )
+            }
+          >
+            <BookOpen className="w-5 h-5 flex-shrink-0" />
+            <span className="ml-3">View Tutorials</span>
+          </NavLink>
         </nav>
         
         {/* Logout Button */}
