@@ -94,7 +94,18 @@ export const DashboardLayout = () => {
       <header className="h-14 sm:h-16 bg-white/95 backdrop-blur-sm border-b border-gray-200/80 fixed top-0 left-0 right-0 z-40 lg:ml-64 shadow-sm">
         <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {/* Mobile menu button */}
+            {/* AgriSenti Logo and Subtitle - now in header */}
+            <div className="flex items-center gap-3 mr-2">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 sm:p-2.5 rounded-xl shadow-lg ring-2 ring-green-100">
+                <Sprout className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-green-800 text-lg sm:text-xl tracking-tight">AgriSenti</h1>
+                <p className="text-xs text-green-600 font-medium">Smart Farming Platform</p>
+              </div>
+            </div>
+
+            {/* Mobile menu button - only on mobile */}
             {isMobile && (
               <Button
                 variant="ghost"
@@ -254,19 +265,8 @@ export const DashboardLayout = () => {
         )}
         style={{ marginTop: 0, paddingTop: 0 }}
       >
-        {/* Logo Section - Enhanced */}
+        {/* Mobile close button and empty logo section for spacing */}
         <div className="h-14 sm:h-16 flex items-center px-4 sm:px-6 border-b border-gray-200/80 bg-gradient-to-r from-green-50 to-emerald-50">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 sm:p-2.5 rounded-xl shadow-lg ring-2 ring-green-100">
-              <Sprout className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-green-800 text-lg sm:text-xl tracking-tight">AgriSenti</h1>
-              <p className="text-xs text-green-600 font-medium">Smart Farming Platform</p>
-            </div>
-          </div>
-          
-          {/* Mobile close button */}
           {isMobile && (
             <Button
               variant="ghost"
