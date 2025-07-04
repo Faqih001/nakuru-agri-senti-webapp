@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sprout, Target, Users, Award, Heart, Globe, Lightbulb, Shield } from "lucide-react";
+import { Sprout, Target, Users, Award, Heart, Globe, Lightbulb, Shield, User, UserCheck } from "lucide-react";
 
 const About = () => {
   const values = [
@@ -28,21 +28,27 @@ const About = () => {
   const team = [
     {
       name: "Fakii Mohammed",
-      role: "CEO & Founder",
+      role: "CEO",
+      bio: "Visionary leader with extensive experience in educational technology and family-centered solutions.",
+      expertise: "Leadership & Strategy",
       image: "/assets/team/team-member-1.png",
-      description: "Agricultural technology visionary with a passion for empowering farmers"
+      useImage: true
     },
     {
-      name: "Muna Adan",
+      name: "Andrew Ogembo", 
       role: "CTO",
-      image: "/assets/team/team-member-2.png",
-      description: "Tech innovator specializing in AI and agricultural applications"
+      bio: "Technical architect specializing in AI systems and scalable educational platforms.",
+      expertise: "AI & Technology",
+      icon: <User className="w-20 h-20 text-blue-600" />,
+      useImage: false
     },
     {
-      name: "Charmaine Ramaphala",
-      role: "Head of Operations",
-      image: "/assets/team/team-member-3.png",
-      description: "Operations expert ensuring seamless service delivery to farmers"
+      name: "Chiboniso Nyoni",
+      role: "User Experience Lead",
+      bio: "UX expert focused on creating intuitive, family-friendly interfaces that make learning accessible.",
+      expertise: "User Experience",
+      icon: <UserCheck className="w-20 h-20 text-purple-600" />,
+      useImage: false
     }
   ];
 
@@ -198,14 +204,21 @@ const About = () => {
             {team.map((member, index) => (
               <Card key={index} className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
                 <CardContent className="p-8">
-                  <img 
-                    src={member.image} 
-                    alt={member.name}
-                    className="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-green-100"
-                  />
+                  {member.useImage ? (
+                    <img 
+                      src={member.image} 
+                      alt={member.name}
+                      className="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-green-100"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full mx-auto mb-6 bg-gray-100 flex items-center justify-center border-4 border-green-100">
+                      {member.icon}
+                    </div>
+                  )}
                   <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
-                  <p className="text-green-600 font-medium mb-4">{member.role}</p>
-                  <p className="text-gray-600 text-sm">{member.description}</p>
+                  <p className="text-green-600 font-medium mb-2">{member.role}</p>
+                  <p className="text-blue-600 text-sm font-medium mb-4">{member.expertise}</p>
+                  <p className="text-gray-600 text-sm">{member.bio}</p>
                 </CardContent>
               </Card>
             ))}
